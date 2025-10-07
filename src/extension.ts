@@ -45,6 +45,7 @@ import { initializeI18n } from "./i18n"
 import { registerGhostProvider } from "./services/ghost" // kilocode_change
 import { registerMainThreadForwardingLogger } from "./utils/fowardingLogger" // kilocode_change
 import { getKiloCodeWrapperProperties } from "./core/kilocode/wrapper" // kilocode_change
+import { startMobileBridge } from "./bridge/MobileBridge"
 
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -391,6 +392,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 	await checkAndRunAutoLaunchingTask(context) // kilocode_change
+
+	startMobileBridge()
 
 	return new API(outputChannel, provider, socketPath, enableLogging)
 }

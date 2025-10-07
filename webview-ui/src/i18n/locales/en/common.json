@@ -20,7 +20,7 @@
 		"billion_suffix": "b"
 	},
 	"feedback": {
-		"title": "Feedback",
+		"title": "Feedback [LOCAL]",
 		"description": "We'd love to hear your feedback or help with any issues you're experiencing.",
 		"githubIssues": "Report an issue on GitHub",
 		"githubDiscussions": "Join GitHub discussions",

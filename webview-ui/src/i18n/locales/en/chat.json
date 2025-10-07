@@ -138,7 +138,7 @@
 	"addImages": "Add images to message",
 	"sendMessage": "Send message",
 	"stopTts": "Stop text-to-speech",
-	"typeMessage": "Type a message...",
+	"typeMessage": "Type a message... [LOCAL BUILD]",
 	"typeTask": "Type your task here...",
 	"addContext": "@ to add context, / for commands",
 	"dragFiles": "hold shift to drag in files",
