@@ -17,6 +17,7 @@ import { importSettingsWithFeedback } from "../core/config/importExport"
 import { MdmService } from "../services/mdm/MdmService"
 import { t } from "../i18n"
 import { generateTerminalCommand } from "../utils/terminalCommandGenerator" // kilocode_change
+import { startMobileBridge, stopMobileBridge, getBridgeStatus } from "../bridge/MobileBridge"
 
 /**
  * Helper to get the visible ClineProvider instance or log if not found.
@@ -288,6 +289,17 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 			type: "action",
 			action: "toggleAutoApprove",
 		})
+	},
+	startMobileBridge: async (port: number) => {
+		outputChannel.appendLine(`Starting Mobile Bridge on port ${port}...`)
+		startMobileBridge(port)
+	},
+	stopMobileBridge: async () => {
+		outputChannel.appendLine("Stopping Mobile Bridge...")
+		stopMobileBridge()
+	},
+	getMobileBridgeStatus: () => {
+		return getBridgeStatus()
 	},
 })
 

@@ -127,6 +127,12 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setTaskSyncEnabled: (value: boolean) => void
 	featureRoomoteControlEnabled: boolean
 	setFeatureRoomoteControlEnabled: (value: boolean) => void
+	remoteBridgeEnabled: boolean
+	setRemoteBridgeEnabled: (value: boolean) => void
+	mobileBridgePort: number
+	setMobileBridgePort: (value: number) => void
+	mobileBridgeStatus: string
+	setMobileBridgeStatus: (value: string) => void
 	alwaysApproveResubmit?: boolean
 	setAlwaysApproveResubmit: (value: boolean) => void
 	requestDelaySeconds: number
@@ -236,6 +242,9 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		remoteControlEnabled: false,
 		taskSyncEnabled: false,
 		featureRoomoteControlEnabled: false,
+		remoteBridgeEnabled: false,
+		mobileBridgePort: 8080,
+		mobileBridgeStatus: "stopped",
 		alwaysApproveResubmit: false,
 		alwaysAllowWrite: true, // kilocode_change
 		alwaysAllowReadOnly: true, // kilocode_change
@@ -364,6 +373,12 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 					// Update includeTaskHistoryInEnhance if present in state message
 					if ((newState as any).includeTaskHistoryInEnhance !== undefined) {
 						setIncludeTaskHistoryInEnhance((newState as any).includeTaskHistoryInEnhance)
+					}
+					if ((newState as any).remoteBridgeEnabled !== undefined) {
+						setState((prevState) => ({
+							...prevState,
+							remoteBridgeEnabled: (newState as any).remoteBridgeEnabled,
+						}))
 					}
 					// Handle marketplace data if present in state message
 					if (newState.marketplaceItems !== undefined) {
@@ -559,6 +574,9 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		setTaskSyncEnabled: (value) => setState((prevState) => ({ ...prevState, taskSyncEnabled: value }) as any),
 		setFeatureRoomoteControlEnabled: (value) =>
 			setState((prevState) => ({ ...prevState, featureRoomoteControlEnabled: value })),
+		setRemoteBridgeEnabled: (value) => setState((prevState) => ({ ...prevState, remoteBridgeEnabled: value })),
+		setMobileBridgePort: (value) => setState((prevState) => ({ ...prevState, mobileBridgePort: value })),
+		setMobileBridgeStatus: (value) => setState((prevState) => ({ ...prevState, mobileBridgeStatus: value })),
 		setAlwaysApproveResubmit: (value) => setState((prevState) => ({ ...prevState, alwaysApproveResubmit: value })),
 		setRequestDelaySeconds: (value) => setState((prevState) => ({ ...prevState, requestDelaySeconds: value })),
 		setCurrentApiConfigName: (value) => setState((prevState) => ({ ...prevState, currentApiConfigName: value })),
@@ -645,6 +663,8 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		},
 		includeTaskHistoryInEnhance,
 		setIncludeTaskHistoryInEnhance,
+		mobileBridgePort: state.mobileBridgePort,
+		mobileBridgeStatus: state.mobileBridgeStatus,
 	}
 
 	return <ExtensionStateContext.Provider value={contextValue}>{children}</ExtensionStateContext.Provider>

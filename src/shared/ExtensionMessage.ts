@@ -153,6 +153,7 @@ export interface ExtensionMessage {
 		| "insertTextIntoTextarea"
 		| "dismissedUpsells"
 		| "organizationSwitchResult"
+		| "mobileBridgeStatus"
 	text?: string
 	// kilocode_change start
 	payload?:
@@ -436,6 +437,9 @@ export type ExtensionState = Pick<
 	remoteControlEnabled: boolean
 	taskSyncEnabled: boolean
 	featureRoomoteControlEnabled: boolean
+	remoteBridgeEnabled: boolean
+	mobileBridgePort: number
+	mobileBridgeStatus: string
 }
 
 export interface ClineSayTool {

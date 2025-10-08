@@ -36,11 +36,13 @@ import {
 	WandSparkles,
 	SendHorizontal,
 	Paperclip, // kilocode_change
+	Server,
 } from "lucide-react"
 import { IndexingStatusBadge } from "./IndexingStatusBadge"
 import { cn } from "@/lib/utils"
 import { usePromptHistory } from "./hooks/usePromptHistory"
 import { EditModeControls } from "./EditModeControls"
+import { MobileBridgeSettings } from "../settings/MobileBridgeSettings"
 
 // kilocode_change start: pull slash commands from Cline
 import SlashCommandMenu from "@/components/chat/SlashCommandMenu"
@@ -110,6 +112,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			globalWorkflows, // kilocode_change
 			taskHistoryVersion, // kilocode_change
 			clineMessages,
+			mobileBridgePort,
+			mobileBridgeStatus,
+			setMobileBridgeStatus,
 		} = useExtensionState()
 
 		// Find the ID and display text for the currently selected API configuration
@@ -249,6 +254,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const [isEnhancingPrompt, setIsEnhancingPrompt] = useState(false)
 		const [isFocused, setIsFocused] = useState(false)
 		const [imageWarning, setImageWarning] = useState<string | null>(null) // kilocode_change
+		const [isMobileBridgeSettingsOpen, setIsMobileBridgeSettingsOpen] = useState(false)
 
 		// Use custom hook for prompt history navigation
 		const { handleHistoryNavigation, resetHistoryNavigation, resetOnInputChange } = usePromptHistory({
@@ -1518,6 +1524,27 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						</StandardTooltip>
 					)}
 					{/* kilocode_change end */}
+					<StandardTooltip content={t("Remote Bridge")}>
+						<button
+							aria-label={t("Remote Bridge")}
+							onClick={() => setIsMobileBridgeSettingsOpen(!isMobileBridgeSettingsOpen)}
+							className={cn(
+								"relative inline-flex items-center justify-center",
+								"bg-transparent border-none p-1.5",
+								"rounded-md min-w-[28px] min-h-[28px]",
+								"opacity-60 hover:opacity-100 text-vscode-descriptionForeground hover:text-vscode-foreground",
+								"transition-all duration-150",
+								"hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)]",
+								"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+								"active:bg-[rgba(255,255,255,0.1)]",
+								"cursor-pointer",
+							)}>
+							<Server className="w-4 h-4" />
+							{mobileBridgeStatus === "running" && (
+								<div className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full" />
+							)}
+						</button>
+					</StandardTooltip>
 				</div>
 
 				{!inputValue && (
@@ -1666,6 +1693,26 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				)}
 
 				{/* kilocode_change: renderNonEditModeControls moved */}
+				{isMobileBridgeSettingsOpen && (
+					<div className="absolute bottom-20 right-10 z-10 bg-vscode-sideBar-background border border-vscode-focusBorder rounded-md shadow-lg">
+						<MobileBridgeSettings
+							port={mobileBridgePort}
+							setPort={(port: number) => vscode.postMessage({ type: "mobileBridgePort", value: port })}
+							serverStatus={mobileBridgeStatus}
+							onSave={() => setIsMobileBridgeSettingsOpen(false)}
+							enabled={mobileBridgeStatus === "running"}
+							setEnabled={(enabled: boolean) => {
+								if (enabled) {
+									vscode.postMessage({ type: "startMobileBridge", value: mobileBridgePort })
+									setMobileBridgeStatus("running")
+								} else {
+									vscode.postMessage({ type: "stopMobileBridge" })
+									setMobileBridgeStatus("stopped")
+								}
+							}}
+						/>
+					</div>
+				)}
 			</div>
 		)
 	},

@@ -78,6 +78,7 @@ import deepEqual from "fast-deep-equal" // kilocode_change
 import { GhostServiceSettingsView } from "../kilocode/settings/GhostServiceSettings" // kilocode_change
 import { SlashCommandsSettings } from "./SlashCommandsSettings"
 import { UISettings } from "./UISettings"
+import { MobileBridgeSettings } from "./MobileBridgeSettings"
 
 export const settingsTabsContainer = "flex flex-1 overflow-hidden [&.narrow_.tab-label]:hidden"
 export const settingsTabList =
@@ -102,7 +103,6 @@ const sectionNames = [
 	"terminal",
 	"prompts",
 	"ui",
-	"experimental",
 	"language",
 	"mcp",
 	"about",
@@ -232,6 +232,9 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 		kiloCodeImageApiKey,
 		openRouterImageGenerationSelectedModel,
 		reasoningBlockCollapsed,
+		remoteBridgeEnabled,
+		mobileBridgePort,
+		mobileBridgeStatus,
 	} = cachedState
 
 	const apiConfiguration = useMemo(() => cachedState.apiConfiguration ?? {}, [cachedState.apiConfiguration])
@@ -275,6 +278,18 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 		}
 	}, [extensionState, isChangeDetected])
 	// kilocode_change end
+	useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			const message = event.data
+			if (message.type === "mobileBridgeStatus") {
+				setCachedStateField("mobileBridgeStatus", message.text)
+			}
+		}
+		window.addEventListener("message", handleMessage)
+		return () => {
+			window.removeEventListener("message", handleMessage)
+		}
+	}, [])
 
 	// Bust the cache when settings are imported.
 	useEffect(() => {
@@ -460,6 +475,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 				type: "openRouterImageGenerationSelectedModel",
 				text: openRouterImageGenerationSelectedModel,
 			})
+			vscode.postMessage({ type: "mobileBridgePort", value: mobileBridgePort })
 			// Update cachedState to match the current state to prevent isChangeDetected from being set back to true
 			setCachedState((prevState) => ({ ...prevState, ...extensionState }))
 			setChangeDetected(false)
@@ -571,7 +587,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 			{ id: "terminal", icon: SquareTerminal },
 			{ id: "prompts", icon: MessageSquare },
 			// { id: "ui", icon: Glasses }, // kilocode_change: we have our own display section
-			{ id: "experimental", icon: FlaskConical },
 			{ id: "language", icon: Globe },
 			{ id: "mcp", icon: Server },
 			{ id: "about", icon: Info },
@@ -910,30 +925,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 						<UISettings
 							reasoningBlockCollapsed={reasoningBlockCollapsed ?? true}
 							setCachedStateField={setCachedStateField}
-						/>
-					)}
-
-					{/* Experimental Section */}
-					{activeTab === "experimental" && (
-						<ExperimentalSettings
-							setExperimentEnabled={setExperimentEnabled}
-							experiments={experiments}
-							// kilocode_change start
-							setCachedStateField={setCachedStateField}
-							morphApiKey={morphApiKey}
-							fastApplyModel={fastApplyModel}
-							// kilocode_change end
-							apiConfiguration={apiConfiguration}
-							setApiConfigurationField={setApiConfigurationField}
-							openRouterImageApiKey={openRouterImageApiKey as string | undefined}
-							kiloCodeImageApiKey={kiloCodeImageApiKey}
-							openRouterImageGenerationSelectedModel={
-								openRouterImageGenerationSelectedModel as string | undefined
-							}
-							setOpenRouterImageApiKey={setOpenRouterImageApiKey}
-							setKiloCodeImageApiKey={setKiloCodeImageApiKey}
-							setImageGenerationSelectedModel={setImageGenerationSelectedModel}
-							currentProfileKilocodeToken={apiConfiguration.kilocodeToken}
 						/>
 					)}
 

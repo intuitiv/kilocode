@@ -34,7 +34,14 @@
 		"ui": "UI",
 		"experimental": "Experimental",
 		"language": "Language",
-		"about": "About Kilo Code"
+		"about": "About Kilo Code",
+		"mobileBridge": "Mobile Bridge"
+	},
+	"mobileBridge": {
+		"port": "Port",
+		"status": "Server Status",
+		"save": "Save",
+		"enabled": "Enabled"
 	},
 	"slashCommands": {
 		"description": "Manage your slash commands to quickly execute custom workflows and actions. <DocsLink>Learn more</DocsLink>"

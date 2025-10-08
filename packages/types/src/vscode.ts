@@ -63,6 +63,9 @@ export const commandIds = [
 	"handleExternalUri", // kilocode_change - for JetBrains plugin URL forwarding
 	"focusPanel",
 	"toggleAutoApprove",
+	"startMobileBridge",
+	"stopMobileBridge",
+	"getMobileBridgeStatus",
 ] as const
 
 export type CommandId = (typeof commandIds)[number]

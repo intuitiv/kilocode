@@ -105,6 +105,10 @@ export const globalSettingsSchema = z.object({
 	remoteBrowserHost: z.string().optional(),
 	cachedChromeHostUrl: z.string().optional(),
 
+	remoteBridgeEnabled: z.boolean().optional(),
+	mobileBridgePort: z.number().optional(),
+	mobileBridgeStatus: z.string().optional(),
+
 	enableCheckpoints: z.boolean().optional(),
 
 	ttsEnabled: z.boolean().optional(),

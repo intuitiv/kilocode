@@ -45,7 +45,7 @@ import { initializeI18n } from "./i18n"
 import { registerGhostProvider } from "./services/ghost" // kilocode_change
 import { registerMainThreadForwardingLogger } from "./utils/fowardingLogger" // kilocode_change
 import { getKiloCodeWrapperProperties } from "./core/kilocode/wrapper" // kilocode_change
-import { startMobileBridge } from "./bridge/MobileBridge"
+import { startMobileBridge, stopMobileBridge, getBridgeStatus } from "./bridge/MobileBridge"
 
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -393,7 +393,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	await checkAndRunAutoLaunchingTask(context) // kilocode_change
 
-	startMobileBridge()
+	startMobileBridge(8080)
+
+	const updateMobileBridgeStatus = () => {
+		const status = getBridgeStatus()
+		ClineProvider.getVisibleInstance()?.postMessageToWebview({
+			type: "mobileBridgeStatus",
+			text: status,
+		})
+	}
+
+	setInterval(updateMobileBridgeStatus, 5000)
+	updateMobileBridgeStatus()
 
 	return new API(outputChannel, provider, socketPath, enableLogging)
 }
