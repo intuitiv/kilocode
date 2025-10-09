@@ -265,3 +265,21 @@ curl -X POST -H "Content-Type: application/json" -d '{"mode": "code"}' http://12
 	"status": "ok"
 }
 ```
+
+### `GET /health`
+
+Returns the health status of the mobile bridge and basic workspace information.
+
+**cURL Command:**
+
+```bash
+curl http://127.0.0.1:8080/health
+```
+
+**Response:**
+
+```json
+{
+	"status": "ok",
+	"workspacePath": "/path/to/your/workspace"
+}

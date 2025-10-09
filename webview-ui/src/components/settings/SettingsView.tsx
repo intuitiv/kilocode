@@ -17,7 +17,6 @@ import {
 	Bell,
 	Database,
 	SquareTerminal,
-	FlaskConical,
 	AlertTriangle,
 	Globe,
 	Info,
@@ -68,7 +67,6 @@ import { DisplaySettings } from "./DisplaySettings" // kilocode_change
 import { NotificationSettings } from "./NotificationSettings"
 import { ContextManagementSettings } from "./ContextManagementSettings"
 import { TerminalSettings } from "./TerminalSettings"
-import { ExperimentalSettings } from "./ExperimentalSettings"
 import { LanguageSettings } from "./LanguageSettings"
 import { About } from "./About"
 import { Section } from "./Section"
@@ -78,7 +76,6 @@ import deepEqual from "fast-deep-equal" // kilocode_change
 import { GhostServiceSettingsView } from "../kilocode/settings/GhostServiceSettings" // kilocode_change
 import { SlashCommandsSettings } from "./SlashCommandsSettings"
 import { UISettings } from "./UISettings"
-import { MobileBridgeSettings } from "./MobileBridgeSettings"
 
 export const settingsTabsContainer = "flex flex-1 overflow-hidden [&.narrow_.tab-label]:hidden"
 export const settingsTabList =
@@ -232,9 +229,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 		kiloCodeImageApiKey,
 		openRouterImageGenerationSelectedModel,
 		reasoningBlockCollapsed,
-		remoteBridgeEnabled,
-		mobileBridgePort,
-		mobileBridgeStatus,
 	} = cachedState
 
 	const apiConfiguration = useMemo(() => cachedState.apiConfiguration ?? {}, [cachedState.apiConfiguration])
@@ -278,18 +272,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 		}
 	}, [extensionState, isChangeDetected])
 	// kilocode_change end
-	useEffect(() => {
-		const handleMessage = (event: MessageEvent) => {
-			const message = event.data
-			if (message.type === "mobileBridgeStatus") {
-				setCachedStateField("mobileBridgeStatus", message.text)
-			}
-		}
-		window.addEventListener("message", handleMessage)
-		return () => {
-			window.removeEventListener("message", handleMessage)
-		}
-	}, [])
 
 	// Bust the cache when settings are imported.
 	useEffect(() => {
@@ -311,6 +293,19 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 			return { ...prevState, [field]: value }
 		})
 	}, [])
+
+	useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			const message = event.data
+			if (message.type === "mobileBridgeStatus") {
+				setCachedStateField("mobileBridgeStatus", message.text)
+			}
+		}
+		window.addEventListener("message", handleMessage)
+		return () => {
+			window.removeEventListener("message", handleMessage)
+		}
+	}, [setCachedStateField])
 
 	const setApiConfigurationField = useCallback(
 		<K extends keyof ProviderSettings>(field: K, value: ProviderSettings[K], isUserAction: boolean = true) => {
@@ -353,27 +348,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 
 			setChangeDetected(true)
 			return { ...prevState, telemetrySetting: setting }
-		})
-	}, [])
-
-	const setOpenRouterImageApiKey = useCallback((apiKey: string) => {
-		setCachedState((prevState) => {
-			setChangeDetected(true)
-			return { ...prevState, openRouterImageApiKey: apiKey }
-		})
-	}, [])
-
-	const setKiloCodeImageApiKey = useCallback((apiKey: string) => {
-		setCachedState((prevState) => {
-			setChangeDetected(true)
-			return { ...prevState, kiloCodeImageApiKey: apiKey }
-		})
-	}, [])
-
-	const setImageGenerationSelectedModel = useCallback((model: string) => {
-		setCachedState((prevState) => {
-			setChangeDetected(true)
-			return { ...prevState, openRouterImageGenerationSelectedModel: model }
 		})
 	}, [])
 
@@ -475,7 +449,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 				type: "openRouterImageGenerationSelectedModel",
 				text: openRouterImageGenerationSelectedModel,
 			})
-			vscode.postMessage({ type: "mobileBridgePort", value: mobileBridgePort })
 			// Update cachedState to match the current state to prevent isChangeDetected from being set back to true
 			setCachedState((prevState) => ({ ...prevState, ...extensionState }))
 			setChangeDetected(false)
