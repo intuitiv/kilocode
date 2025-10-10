@@ -9,6 +9,8 @@ mock/
 .DS_Store
 *.orig
 
+./apps/kilo-remote/.expo/*
+./apps/kilo-remote/node_modules/*
 # Builds
 bin/
 bin-unpacked/
