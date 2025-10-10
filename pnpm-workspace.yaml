@@ -1,7 +1,13 @@
 packages:
   - src
   - webview-ui
-  - apps/*
+  - apps/kilocode-docs
+  - apps/playwright-e2e
+  - apps/storybook
+  - apps/vscode-e2e
+  - apps/vscode-nightly
+  - apps/web-evals
+  - apps/web-roo-code
   - packages/*
   - jetbrains/host
   - jetbrains/plugin
