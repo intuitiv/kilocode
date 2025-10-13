@@ -1,25 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
+import TaskItem from './history/TaskItem';
 
-const mockTasks = [
-  { id: '1', text: 'Task 1' },
-  { id: '2', text: 'Task 2' },
-  { id: '3', text: 'Task 3' },
+const sampleTasks = [
+  { id: '1', title: 'Fix timestamp bug', date: '2025-10-13', isFavorite: false },
+  { id: '2', title: 'Implement new feature', date: '2025-10-12', isFavorite: true },
+  { id: '3', title: 'Refactor ChatView', date: '2025-10-11', isFavorite: false },
 ];
 
 const HistoryView = () => {
+  const [tasks, setTasks] = useState(sampleTasks);
+
+  const handleSelect = (item) => {
+    console.log('Selected:', item);
+  };
+
+  const handleToggleFavorite = (item) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === item.id ? { ...task, isFavorite: !task.isFavorite } : task
+      )
+    );
+  };
+
+  const handleDelete = (item) => {
+    setTasks(tasks.filter((task) => task.id !== item.id));
+  };
+
   return (
-    <View className="flex-1 w-full">
-      <FlatList
-        data={mockTasks}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="p-2 my-1 mx-2 rounded-lg bg-gray-200">
-            <Text>{item.text}</Text>
-          </View>
-        )}
-      />
-    </View>
+    <FlatList
+      data={tasks}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <TaskItem
+          item={item}
+          onSelect={handleSelect}
+          onToggleFavorite={handleToggleFavorite}
+          onDelete={handleDelete}
+        />
+      )}
+    />
   );
 };
 
