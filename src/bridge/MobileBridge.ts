@@ -211,7 +211,7 @@ export function startMobileBridge(port: number) {
 				}
 				const task = await provider.getTaskWithId(taskId);
 				res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
-				res.end(JSON.stringify(task));
+				res.end(JSON.stringify(task.uiMessages));
 			} catch (error) {
 				res.writeHead(404, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
 				res.end(JSON.stringify({ error: "Task not found" }));

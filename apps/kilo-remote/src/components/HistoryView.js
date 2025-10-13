@@ -1,45 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import TaskItem from './history/TaskItem';
+import { useNavigation } from '@react-navigation/native';
 
-const sampleTasks = [
-  { id: '1', title: 'Fix timestamp bug', date: '2025-10-13', isFavorite: false },
-  { id: '2', title: 'Implement new feature', date: '2025-10-12', isFavorite: true },
-  { id: '3', title: 'Refactor ChatView', date: '2025-10-11', isFavorite: false },
-];
-
+import { TextInput } from 'react-native';
 const HistoryView = () => {
-  const [tasks, setTasks] = useState(sampleTasks);
+  const [tasks, setTasks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const activeWorkspace = "/Users/sainath/PycharmProjects/kilocode/kilocode";
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    fetch('http://localhost:3000/tasks')
+      .then((response) => response.json())
+      .then((data) => {
+        const filteredTasks = data.filter(
+          (task) =>
+            task.workspace === activeWorkspace &&
+            task.task.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        const sortedTasks = filteredTasks.sort((a, b) => b.ts - a.ts);
+        setTasks(sortedTasks);
+      });
+  }, [searchQuery]);
 
   const handleSelect = (item) => {
-    console.log('Selected:', item);
-  };
-
-  const handleToggleFavorite = (item) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === item.id ? { ...task, isFavorite: !task.isFavorite } : task
-      )
-    );
-  };
-
-  const handleDelete = (item) => {
-    setTasks(tasks.filter((task) => task.id !== item.id));
+    navigation.navigate('Chat', { taskId: item.id });
   };
 
   return (
-    <FlatList
-      data={tasks}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TaskItem
-          item={item}
-          onSelect={handleSelect}
-          onToggleFavorite={handleToggleFavorite}
-          onDelete={handleDelete}
-        />
-      )}
-    />
+    <View>
+      <FlatList
+        data={tasks}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TaskItem
+            item={item}
+            onSelect={handleSelect}
+          />
+        )}
+      />
+    </View>
   );
 };
 

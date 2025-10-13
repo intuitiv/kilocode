@@ -13,17 +13,30 @@ import ChatInput from './ChatInput';
 import ChatRow from './ChatRow';
 import { streamMessages } from '../services/api';
 
-const ChatView = () => {
+const ChatView = ({ route }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [mode, setMode] = useState('chat');
   const flatListRef = useRef(null);
   const inputRef = useRef(null);
+  const { taskId } = route.params || {};
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (taskId) {
+      fetch(`http://localhost:3000/stream/${taskId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setMessages(data);
+          const task = sampleTasks.find((task) => task.id === taskId);
+          if (task) {
+            setMode(task.mode);
+          }
+        });
+    } else {
+      inputRef.current?.focus();
+    }
+  }, [taskId]);
   const handleSend = () => {
     if (!inputValue.trim()) return;
     setMessages([...messages, { id: Date.now().toString(), text: inputValue, sender: 'user' }]);

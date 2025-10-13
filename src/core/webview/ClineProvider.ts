@@ -92,7 +92,7 @@ import { getSystemPromptFilePath } from "../prompts/sections/custom-system-promp
 
 import { webviewMessageHandler } from "./webviewMessageHandler"
 import type { ClineMessage } from "@roo-code/types"
-import { readApiMessages, saveApiMessages, saveTaskMessages } from "../task-persistence"
+import { readApiMessages, readTaskMessages, saveApiMessages, saveTaskMessages } from "../../core/task-persistence"
 import { getNonce } from "./getNonce"
 import { getUri } from "./getUri"
 
@@ -1525,6 +1525,7 @@ export class ClineProvider
 		apiConversationHistoryFilePath: string
 		uiMessagesFilePath: string
 		apiConversationHistory: Anthropic.MessageParam[]
+		uiMessages: ClineMessage[]
 	}> {
 		const history = this.getGlobalState("taskHistory") ?? []
 		const historyItem = history.find((item) => item.id === id)
@@ -1535,25 +1536,32 @@ export class ClineProvider
 			const taskDirPath = await getTaskDirectoryPath(globalStoragePath, id)
 			const apiConversationHistoryFilePath = path.join(taskDirPath, GlobalFileNames.apiConversationHistory)
 			const uiMessagesFilePath = path.join(taskDirPath, GlobalFileNames.uiMessages)
-			const fileExists = await fileExistsAtPath(apiConversationHistoryFilePath)
+			const apiFileExists = await fileExistsAtPath(apiConversationHistoryFilePath)
+			const uiFileExists = await fileExistsAtPath(uiMessagesFilePath)
 
-			if (fileExists) {
-				const apiConversationHistory = JSON.parse(await fs.readFile(apiConversationHistoryFilePath, "utf8"))
-
+			if (apiFileExists && uiFileExists) {
+				const apiConversationHistory = await readApiMessages({ taskId: id, globalStoragePath })
+				const uiMessages = await readTaskMessages({ taskId: id, globalStoragePath })
 				return {
 					historyItem,
 					taskDirPath,
 					apiConversationHistoryFilePath,
 					uiMessagesFilePath,
 					apiConversationHistory,
+					uiMessages,
 				}
 			} else {
-				vscode.window.showErrorMessage(
-					`Task file not found for task ID: ${id} (file ${apiConversationHistoryFilePath})`,
-				) //kilocode_change show extra debugging information to debug task not found issues
+				if (!apiFileExists) {
+					vscode.window.showErrorMessage(
+						`Task file not found for task ID: ${id} (file ${apiConversationHistoryFilePath})`,
+					)
+				}
+				if (!uiFileExists) {
+					vscode.window.showErrorMessage(`Task file not found for task ID: ${id} (file ${uiMessagesFilePath})`)
+				}
 			}
 		} else {
-			vscode.window.showErrorMessage(`Task with ID: ${id} not found in history.`) // kilocode_change show extra debugging information to debug task not found issues
+			vscode.window.showErrorMessage(`Task with ID: ${id} not found in history.`)
 		}
 
 		// if we tried to get a task that doesn't exist, remove it from state
@@ -1901,6 +1909,9 @@ export class ClineProvider
 			openRouterImageGenerationSelectedModel,
 			openRouterUseMiddleOutTransform,
 			featureRoomoteControlEnabled,
+			remoteBridgeEnabled,
+			mobileBridgePort,
+			mobileBridgeStatus,
 		} = await this.getState()
 
 		let cloudOrganizations: CloudOrganizationMembership[] = []
@@ -2080,6 +2091,9 @@ export class ClineProvider
 			openRouterImageGenerationSelectedModel,
 			openRouterUseMiddleOutTransform,
 			featureRoomoteControlEnabled,
+			remoteBridgeEnabled,
+			mobileBridgePort,
+			mobileBridgeStatus,
 		}
 	}
 
@@ -2338,6 +2352,9 @@ export class ClineProvider
 					return false
 				}
 			})(),
+			remoteBridgeEnabled: stateValues.remoteBridgeEnabled ?? false,
+			mobileBridgePort: stateValues.mobileBridgePort ?? 31415,
+			mobileBridgeStatus: stateValues.mobileBridgeStatus ?? "stopped",
 		}
 	}
 

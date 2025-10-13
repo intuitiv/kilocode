@@ -1,5 +1,60 @@
 const http = require('http');
 
+const sampleTasks = [
+  {
+    "id": "0108125e-f9e2-4a3f-bc21-001",
+    "number": 42,
+    "ts": 1728230400000,
+    "task": "added a mobile bridge button to the kilo code interface",
+    "tokensIn": 350,
+    "tokensOut": 120,
+    "tokensTotal": 470,
+    "workspace": "/Users/sainath/PycharmProjects/kilocode/kilocode",
+    "mode": "architect",
+    "totalCost": 0.0025,
+    "rootTaskId": null
+  },
+  {
+    "id": "0108125e-f9e2-4a3f-bc21-004",
+    "number": 43,
+    "ts": 1728230500000,
+    "task": "another task for the same workspace",
+    "tokensIn": 350,
+    "tokensOut": 120,
+    "tokensTotal": 470,
+    "workspace": "/Users/sainath/PycharmProjects/kilocode/kilocode",
+    "mode": "architect",
+    "totalCost": 0.0025,
+    "rootTaskId": null
+  },
+  {
+    "id": "4c11a6b2-8c9e-11ee-89fa-002",
+    "number": 7,
+    "ts": 1728320400000,
+    "task": "Create an expo project for kilo mobile bridge",
+    "tokensIn": 210,
+    "tokensOut": 95,
+    "tokensTotal": 305,
+    "workspace": "/Users/sainath/WebstormProjects/kilo-mobile",
+    "mode": "architect",
+    "totalCost": 0.0015,
+    "rootTaskId": null
+  },
+  {
+    "id": "fd4a7d1f-213d-4b5a-9f33-003",
+    "number": 15,
+    "ts": 1728406800000,
+    "task": "Hello, Kilo!",
+    "tokensIn": 12,
+    "tokensOut": 20,
+    "tokensTotal": 32,
+    "workspace": "/Users/sainath/AdhocProjects/ai-studio-organiser",
+    "mode": "ask",
+    "totalCost": 0.00005,
+    "rootTaskId": null
+  }
+];
+
 const sampleMessages = [
     {
         "ts": 1761000005000,
@@ -123,7 +178,7 @@ const sampleMessages = [
 ];
 
 http.createServer((req, res) => {
-    console.log('New incomeing request');
+    console.log('New incomeing request' + req.url);
     if (req.url === '/stream') {
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -148,9 +203,28 @@ http.createServer((req, res) => {
         req.on('close', () => {
             clearInterval(interval);
         });
-    } else {
+    } else if (req.url === '/tasks') {
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(JSON.stringify(sampleTasks));
+    } else if (req.url.startsWith('/stream/')) {
+      const id = req.url.split('/')[2];
+      const task = sampleTasks.find((task) => task.id === id);
+      if (task) {
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        });
+        res.end(JSON.stringify(sampleMessages));
+      } else {
         res.writeHead(404);
         res.end();
+      }
+    } else {
+      res.writeHead(404);
+      res.end();
     }
 }).listen(3000);
 
