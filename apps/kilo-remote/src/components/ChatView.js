@@ -1,92 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList } from 'react-native';
-import EventSource from 'react-native-event-source';
-import HistoryView from './HistoryView';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import HistoryView from './HistoryView';
+import ChatInput from './ChatInput';
+import ChatRow from './ChatRow';
+import { streamMessages } from '../services/api';
 
 const ChatView = () => {
-  console.log('ChatView rendered');
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [mode, setMode] = useState('chat');
+  const flatListRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
-    let eventSource;
-
-    if (isStreaming) {
-      eventSource = new EventSource('http://localhost:3000/stream');
-
-      eventSource.addEventListener('open', () => {
-        console.log('EventSource opened');
-      });
-
-      eventSource.addEventListener('message', (event) => {
-        console.log('Received message:', event.data);
-        const newMessage = JSON.parse(event.data);
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
-
-      eventSource.addEventListener('error', (event) => {
-        console.error('EventSource error:', event);
-        setIsStreaming(false);
-      });
-    }
-
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-      }
-    };
-  }, [isStreaming]);
-
+    inputRef.current?.focus();
+  }, []);
   const handleSend = () => {
-    if (inputValue.trim()) {
-      setMessages([...messages, { id: Date.now().toString(), text: inputValue, sender: 'user' }]);
-      setInputValue('');
-      setIsStreaming(true);
-    }
+    if (!inputValue.trim()) return;
+    setMessages([...messages, { id: Date.now().toString(), text: inputValue, sender: 'user' }]);
+    setInputValue('');
+    setIsStreaming(true);
+    streamMessages(
+      (newMessage) => {
+        if (newMessage.partial) {
+          setMessages((prevMessages) => {
+            const newMessages = [...prevMessages];
+            const lastMessage = newMessages[newMessages.length - 1];
+            if (lastMessage && lastMessage.ts === newMessage.ts) {
+              newMessages[newMessages.length - 1] = newMessage;
+            } else {
+              newMessages.push(newMessage);
+            }
+            return newMessages;
+          });
+        } else {
+          setMessages((prevMessages) => {
+            const newMessages = [...prevMessages];
+            const lastMessage = newMessages[newMessages.length - 1];
+            if (lastMessage && lastMessage.ts === newMessage.ts) {
+              newMessages[newMessages.length - 1] = newMessage;
+            } else {
+              newMessages.push(newMessage);
+            }
+            return newMessages;
+          });
+        }
+      },
+      () => {
+        setIsStreaming(false);
+      }
+    );
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
   };
 
   const handleCancel = () => {
     setIsStreaming(false);
   };
-
-  const handleModeSwitch = () => {
-    setMode(mode === 'chat' ? 'history' : 'chat');
-  };
+  const handleModeSwitch = () => setMode(mode === 'chat' ? 'history' : 'chat');
 
   return (
-    <View className="flex-1 w-full">
-      <View className="flex-row items-center justify-between p-2 border-b border-gray-200">
-        <Text className="text-lg font-bold">{mode === 'chat' ? 'Chat' : 'History'}</Text>
-        <Icon.Button name="history" backgroundColor="#3b5998" onPress={handleModeSwitch}>
-          {mode === 'chat' ? 'History' : 'Chat'}
-        </Icon.Button>
-      </View>
+    <View style={styles.container}>
       {mode === 'chat' ? (
         <>
-          <FlatList
-            data={messages}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View className={`p-2 my-1 mx-2 rounded-lg ${item.sender === 'user' ? 'bg-primary self-end' : 'bg-gray-200 self-start'}`}>
-                <Text className={item.sender === 'user' ? 'text-white' : 'text-black'}>{item.text}</Text>
-              </View>
-            )}
-          />
-          <View className="flex-row items-center p-2 border-t border-gray-200">
-            <TextInput
-              className="flex-1 border border-gray-300 rounded-lg p-2 mr-2"
-              value={inputValue}
-              onChangeText={setInputValue}
-              placeholder="Type a message..."
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+          >
+            {/* Scrollable messages */}
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <ChatRow item={item} onSuggestionPress={(suggestion) => {
+                setInputValue(suggestion);
+              }} />}
+              contentContainerStyle={{ padding: 10, paddingBottom: 150 }} // reserve bottom space
+              showsVerticalScrollIndicator={true}
             />
-            {isStreaming ? (
-              <Button title="Cancel" onPress={handleCancel} />
-            ) : (
-              <Button title="Send" onPress={handleSend} />
-            )}
+          </KeyboardAvoidingView>
+
+          {/* Fixed input at bottom (separate layer) */}
+          <View style={styles.inputContainer}>
+            <ChatInput
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              isStreaming={isStreaming}
+              handleSend={handleSend}
+              handleCancel={handleCancel}
+              handleModeSwitch={handleModeSwitch}
+              mode={mode}
+              inputRef={inputRef}
+            />
           </View>
         </>
       ) : (
@@ -97,3 +111,20 @@ const ChatView = () => {
 };
 
 export default ChatView;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#f3f4f6',
+  },
+  inputContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+});
