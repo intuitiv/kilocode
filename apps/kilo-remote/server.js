@@ -1,4 +1,11 @@
-const http = require('http');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 
 const sampleTasks = [
   {
@@ -177,55 +184,128 @@ const sampleMessages = [
     },
 ];
 
-http.createServer((req, res) => {
-    console.log('New incomeing request' + req.url);
-    if (req.url === '/stream') {
-        res.writeHead(200, {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Cache-Control, x-requested-with',
-        });
+app.get('/health', (req, res) => {
+  console.log('GET /health');
+  res.json({ status: 'ok', workspacePath: '/Users/sainath/PycharmProjects/kilocode/kilocode' });
+});
 
-        let i = 0;
-        const interval = setInterval(() => {
-            if (i < sampleMessages.length) {
-                const message = sampleMessages[i];
-                res.write(`data: ${JSON.stringify(message)}\n\n`);
-                i++;
-            } else {
-                clearInterval(interval);
-                res.end();
-            }
-        }, 250);
+app.get('/modes', (req, res) => {
+  console.log('GET /modes');
+  res.json([
+    { slug: 'architect', name: 'Architect' },
+    { slug: 'code', name: 'Code' },
+    { slug: 'debug', name: 'Debug' },
+    { slug: 'test', name: 'Test' },
+    { slug: 'translate', name: 'Translate' },
+  ]);
+});
 
-        req.on('close', () => {
-            clearInterval(interval);
-        });
-    } else if (req.url === '/tasks') {
-      res.writeHead(200, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      });
-      res.end(JSON.stringify(sampleTasks));
-    } else if (req.url.startsWith('/stream/')) {
-      const id = req.url.split('/')[2];
-      const task = sampleTasks.find((task) => task.id === id);
-      if (task) {
-        res.writeHead(200, {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        });
-        res.end(JSON.stringify(sampleMessages));
-      } else {
-        res.writeHead(404);
-        res.end();
-      }
+app.post('/modes', (req, res) => {
+  console.log('POST /modes', req.body);
+  res.json({ status: 'ok' });
+});
+
+app.get('/tasks', (req, res) => {
+  console.log('GET /tasks');
+  res.json(sampleTasks);
+});
+
+app.get('/tasks/:taskId', (req, res) => {
+  const { taskId } = req.params;
+  console.log(`GET /tasks/${taskId}`);
+  const task = sampleTasks.find(t => t.id === taskId);
+  if (task) {
+    res.json({
+      historyItem: task,
+      apiConversationHistory: sampleMessages,
+    });
+  } else {
+    res.status(404).json({ error: 'Task not found' });
+  }
+});
+
+app.post('/new-task', (req, res) => {
+  const taskId = crypto.randomUUID();
+  console.log(`POST /new-task, message: "${req.body.message}". Responding with taskId: ${taskId}`);
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*',
+  });
+
+  // Send taskId event first
+  res.write(`id: ${Date.now()}\n`);
+  res.write(`event: taskId\n`);
+  res.write(`data: ${JSON.stringify({ taskId })}\n\n`);
+
+  // Stream sample messages
+  const sendEvent = (index) => {
+    if (index < sampleMessages.length) {
+      const message = sampleMessages[index];
+      res.write(`data: ${JSON.stringify(message)}\n\n`);
+      setTimeout(() => sendEvent(index + 1), 250);
     } else {
-      res.writeHead(404);
       res.end();
     }
-}).listen(3000);
+  };
 
-console.log('Server running at http://localhost:3000/');
+  sendEvent(0);
+
+  req.on('close', () => {
+    // Stop sending events if the client disconnects
+  });
+});
+
+app.post('/send-followup', (req, res) => {
+  const { taskId, message } = req.body;
+  console.log(`POST /send-followup for task ${taskId}: "${message}"`);
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*',
+  });
+
+  // Stream sample messages
+  const sendEvent = (index) => {
+    if (index < sampleMessages.length) {
+      const message = sampleMessages[index];
+      res.write(`data: ${JSON.stringify(message)}\n\n`);
+      setTimeout(() => sendEvent(index + 1), 250);
+    } else {
+      res.end();
+    }
+  };
+
+  sendEvent(0);
+
+  req.on('close', () => {
+    // Stop sending events if the client disconnects
+  });
+});
+
+app.get('/current-mode/:taskId', (req, res) => {
+  const { taskId } = req.params;
+  console.log(`GET /current-mode/${taskId}`);
+  const task = sampleTasks.find(t => t.id === taskId);
+  if (task) {
+    res.json({ mode: task.mode });
+  } else {
+    // Default to architect if task not found, or handle as an error
+    res.status(404).json({ error: 'Task not found' });
+  }
+});
+
+app.post('/cancel-task', (req, res) => {
+  const { taskId } = req.body;
+  console.log(`POST /cancel-task for task ${taskId}`);
+  res.json({ status: 'ok' });
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Mock server running at http://localhost:${PORT}/`);
+});

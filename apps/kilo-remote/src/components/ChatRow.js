@@ -14,18 +14,14 @@ import CompletionResultMessage from './messages/CompletionResultMessage';
 
 const ChatRow = ({ item, onSuggestionPress }) => {
   const renderContent = () => {
-    console.log(`Rendering message with ts: ${item.ts}, type: ${item.type}, say: ${item.say}, ask: ${item.ask}`);
-    switch (item.type) {
+   switch (item.type) {
       case 'say':
         switch (item.say) {
           case 'text':
-            console.log('Rendering KiloSaidMessage');
             return <KiloSaidMessage item={item} />;
           case 'api_req_started':
-            console.log('Rendering ApiRequestMessage');
             return <ApiRequestMessage item={item} />;
           case 'user_feedback':
-            console.log('Rendering user_feedback');
             const codeBlockRegex = /```(\w+)\n([\s\S]*?)```/g;
             const parts = [];
             let lastIndex = 0;
@@ -45,43 +41,33 @@ const ChatRow = ({ item, onSuggestionPress }) => {
 
             return parts;
           case 'command_output':
-            console.log('Rendering KiloSaidMessage');
             return <KiloSaidMessage item={item} />;
           case 'completion_result':
-            console.log('Rendering CompletionResultMessage');
             return <CompletionResultMessage item={item} />;
           default:
-            console.log('Rendering default TextMessage');
             return <TextMessage text={item.text} />;
           case 'checkpoint_saved':
-            console.log('Rendering CheckpointMessage');
             return <CheckpointMessage item={item} />;
         }
       case 'ask':
         switch (item.ask) {
           case 'followup':
-            console.log('Rendering KiloQuestionMessage');
             return <KiloQuestionMessage item={item} onSelect={onSuggestionPress} />;
           case 'tool':
             const tool = JSON.parse(item.text);
             if (tool.tool === 'updateTodoList') {
-              console.log('Rendering TodoListMessage');
               return <TodoListMessage item={item} />;
             }
             if (tool.tool === 'readFile' || tool.tool === 'appliedDiff' || tool.tool === 'newFileCreated') {
-              console.log('Rendering FileOperationMessage');
               return <FileOperationMessage item={item} />;
             }
             return <ApiRequestMessage item={item} />;
           case 'command':
-            console.log('Rendering CommandMessage');
             return <CommandMessage item={item} />;
           default:
-            console.log('Rendering default TextMessage');
             return <TextMessage text={item.text} />;
         }
       default:
-        console.log('Rendering default TextMessage');
         return <TextMessage text={item.text} />;
     }
   };
