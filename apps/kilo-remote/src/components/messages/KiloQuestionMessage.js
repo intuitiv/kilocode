@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
-import { Ionicons } from '@expo/vector-icons'; // Using Ionicons from expo
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../hooks/useTheme';
+import { getKiloQuestionMessageStyles } from '../styles';
 
 const KiloQuestionMessage = ({ item, onSelect }) => {
+  const { theme } = useTheme();
+  const styles = getKiloQuestionMessageStyles(theme);
   const question = JSON.parse(item.text);
 
   const formatTime = (ts) => {
@@ -12,56 +16,41 @@ const KiloQuestionMessage = ({ item, onSelect }) => {
   };
 
   return (
-    <View style={{ borderRadius: 8, alignSelf: 'flex-start', paddingVertical: 4 }}>
-      {/* Header Row */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-        <Ionicons name="help-circle-outline" size={18} color="black" />
-        <Text style={{ fontSize: 16, fontWeight: '700'}}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons name="help-circle-outline" size={18} color={theme.primaryText} />
+        <Text style={styles.headerText}>
           Kilo Code has a question
         </Text>
         {item.ts && (
-          <Text style={{ marginLeft: 25, color: '#4B5563', fontSize: 12 }}>
+          <Text style={styles.time}>
             {formatTime(item.ts)}
           </Text>
         )}
       </View>
 
-      {/* Markdown Question */}
-      <View style={{ marginLeft: 25 }}>
-      <Markdown
-        style={{
-          body: { color: 'black' },
-          code_inline: {
-            backgroundColor: '#f0f0f0',
-            padding: 2,
-            borderRadius: 4,
-          },
-          
-        }}
-      >
-        {question.question}
-      </Markdown>
+      <View style={styles.markdownContainer}>
+        <Markdown
+          style={{
+            body: styles.markdownBody,
+            code_inline: styles.code_inline,
+          }}
+        >
+          {question.question}
+        </Markdown>
 
-      {/* Answers */}
-      <View style={{ marginTop: 8 }}>
-        {question.suggest.map((suggestion, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => onSelect?.(suggestion.answer)}
-            activeOpacity={0.7}
-            style={{
-              borderColor: '#9CA3AF',
-              borderWidth: 1,
-              borderRadius: 6,
-              paddingVertical: 8,
-              paddingHorizontal: 10,
-              marginBottom: 6,
-            }}
-          >
-            <Text style={{ color: '#111827' }}>{suggestion.answer}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        <View style={styles.answersContainer}>
+          {question.suggest.map((suggestion, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => onSelect?.(suggestion.answer)}
+              activeOpacity={0.7}
+              style={styles.suggestionButton}
+            >
+              <Text style={styles.suggestionText}>{suggestion.answer}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </View>
   );

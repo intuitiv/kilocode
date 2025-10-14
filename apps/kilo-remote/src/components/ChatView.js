@@ -1,143 +1,178 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import HistoryView from './HistoryView';
+import { useFocusEffect } from '@react-navigation/native';
+import PinnedMessage from './PinnedMessage';
 import ChatInput from './ChatInput';
 import ChatRow from './ChatRow';
-import { streamMessages } from '../services/api';
+import { useTheme } from '../hooks/useTheme';
+import { getChatViewStyles } from './styles';
+import { modeStyles } from '../styles/modes';
+import {
+  startNewTask,
+  sendFollowup,
+  cancelTask,
+  getTaskHistory,
+  setMode as setApiMode,
+} from '../services/api';
 
 const ChatView = ({ route }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [pinnedMessage, setPinnedMessage] = useState('');
   const [mode, setMode] = useState('chat');
+  const { theme } = useTheme();
+  const styles = getChatViewStyles(theme);
   const flatListRef = useRef(null);
   const inputRef = useRef(null);
-  const { taskId } = route.params || {};
 
-  useEffect(() => {
-    if (taskId) {
-      fetch(`http://localhost:3000/stream/${taskId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setMessages(data);
-          const task = sampleTasks.find((task) => task.id === taskId);
-          if (task) {
-            setMode(task.mode);
+  const activeModeStyle = modeStyles[mode] || modeStyles.chat;
+
+  useFocusEffect(
+    useCallback(() => {
+      const { task } = route.params || {};
+      console.log('ChatView focused with task:', task);
+
+      if (task) {
+        console.log('Loading history for taskId:', task.id);
+        setCurrentTaskId(task.id);
+        setPinnedMessage(task.task);
+        setMode(task.mode);
+        getTaskHistory(task.id).then((data) => {
+          if (data) {
+            console.log('History data received:', data);
+            setMessages(data);
           }
         });
+      } else {
+        console.log('New chat session.');
+        setMessages([]);
+        setCurrentTaskId(null);
+        setPinnedMessage('');
+        setMode('chat');
+      }
+    }, [route.params?.task])
+  );
+
+  const onMessage = (newMessage) => {
+    if (newMessage.partial) {
+      setMessages((prevMessages) => {
+        const newMessages = [...prevMessages];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage && lastMessage.sender !== 'user' && lastMessage.ts === newMessage.ts) {
+          newMessages[newMessages.length - 1] = newMessage;
+        } else {
+          newMessages.push(newMessage);
+        }
+        return newMessages;
+      });
     } else {
-      inputRef.current?.focus();
+      setMessages((prevMessages) => {
+        const newMessages = [...prevMessages];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage && lastMessage.sender !== 'user' && lastMessage.ts === newMessage.ts) {
+          newMessages[newMessages.length - 1] = newMessage;
+        } else {
+          newMessages.push(newMessage);
+        }
+        return newMessages;
+      });
     }
-  }, [taskId]);
-  const handleSend = () => {
+  };
+
+  const onError = (error) => {
+    console.error('Streaming error:', error);
+    setIsStreaming(false);
+  };
+
+  const onComplete = () => {
+    setIsStreaming(false);
+  };
+
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
-    setMessages([...messages, { id: Date.now().toString(), text: inputValue, sender: 'user' }]);
+
+    await setApiMode(mode);
+
+    const userMessage = {
+      ts: Date.now(),
+      type: 'say',
+      say: 'text',
+      text: inputValue,
+      sender: 'user',
+    };
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsStreaming(true);
-    streamMessages(
-      (newMessage) => {
-        if (newMessage.partial) {
-          setMessages((prevMessages) => {
-            const newMessages = [...prevMessages];
-            const lastMessage = newMessages[newMessages.length - 1];
-            if (lastMessage && lastMessage.ts === newMessage.ts) {
-              newMessages[newMessages.length - 1] = newMessage;
-            } else {
-              newMessages.push(newMessage);
-            }
-            return newMessages;
-          });
-        } else {
-          setMessages((prevMessages) => {
-            const newMessages = [...prevMessages];
-            const lastMessage = newMessages[newMessages.length - 1];
-            if (lastMessage && lastMessage.ts === newMessage.ts) {
-              newMessages[newMessages.length - 1] = newMessage;
-            } else {
-              newMessages.push(newMessage);
-            }
-            return newMessages;
-          });
-        }
-      },
-      () => {
-        setIsStreaming(false);
-      }
-    );
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+
+    if (!currentTaskId) {
+      setPinnedMessage(inputValue);
+    }
+
+    const onTaskId = (taskId) => {
+      console.log('onTaskId callback received taskId:', taskId);
+      setCurrentTaskId(taskId);
+    };
+
+    if (currentTaskId) {
+      sendFollowup(currentTaskId, inputValue, onMessage, onError, onComplete);
+    } else {
+      startNewTask(inputValue, onMessage, onError, onComplete, onTaskId);
+    }
   };
 
   const handleCancel = () => {
+    cancelTask(currentTaskId);
     setIsStreaming(false);
   };
-  const handleModeSwitch = () => setMode(mode === 'chat' ? 'history' : 'chat');
 
   return (
-    <View style={styles.container}>
-      {mode === 'chat' ? (
-        <>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-          >
-            {/* Scrollable messages */}
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <ChatRow item={item} onSuggestionPress={(suggestion) => {
+    <View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
+      <PinnedMessage message={pinnedMessage} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item, index) => `${item.ts}-${index}`}
+          renderItem={({ item }) => (
+            <ChatRow
+              item={item}
+              onSuggestionPress={(suggestion) => {
                 setInputValue(suggestion);
-              }} />}
-              contentContainerStyle={{ padding: 10, paddingBottom: 150 }} // reserve bottom space
-              showsVerticalScrollIndicator={true}
+              }}
             />
-          </KeyboardAvoidingView>
+          )}
+          contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
+          showsVerticalScrollIndicator={true}
+          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+        />
+      </KeyboardAvoidingView>
 
-          {/* Fixed input at bottom (separate layer) */}
-          <View style={styles.inputContainer}>
-            <ChatInput
-              inputValue={inputValue}
-              setInputValue={setInputValue}
-              isStreaming={isStreaming}
-              handleSend={handleSend}
-              handleCancel={handleCancel}
-              handleModeSwitch={handleModeSwitch}
-              mode={mode}
-              inputRef={inputRef}
-            />
-          </View>
-        </>
-      ) : (
-        <HistoryView />
-      )}
+      <View style={styles.inputContainer}>
+        <ChatInput
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          isStreaming={isStreaming}
+          handleSend={handleSend}
+          handleCancel={handleCancel}
+          mode={mode}
+          onModeChange={setMode}
+          inputRef={inputRef}
+        />
+      </View>
     </View>
   );
 };
 
 export default ChatView;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#f3f4f6',
-  },
-  inputContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
-  },
-});

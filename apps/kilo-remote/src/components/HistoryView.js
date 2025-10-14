@@ -1,31 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, FlatList, TextInput } from 'react-native';
 import TaskItem from './history/TaskItem';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { getTasks } from '../services/api';
+import { getActiveWorkspace } from '../config';
 
-import { TextInput } from 'react-native';
 const HistoryView = () => {
   const [tasks, setTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const activeWorkspace = "/Users/sainath/PycharmProjects/kilocode/kilocode";
+  const activeWorkspace = getActiveWorkspace();
   const navigation = useNavigation();
 
-  useEffect(() => {
-    fetch('http://localhost:3000/tasks')
-      .then((response) => response.json())
-      .then((data) => {
-        const filteredTasks = data.filter(
-          (task) =>
-            task.workspace === activeWorkspace &&
-            task.task.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        const sortedTasks = filteredTasks.sort((a, b) => b.ts - a.ts);
-        setTasks(sortedTasks);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('HistoryView focused');
+      console.log('activeWorkspace:', activeWorkspace);
+      getTasks().then((data) => {
+        if (data) {
+          console.log('All tasks from server:', data);
+          const filteredTasks = data.filter(
+            (task) =>
+              task.workspace === activeWorkspace &&
+              task.task.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          console.log('Filtered tasks:', filteredTasks);
+          const sortedTasks = filteredTasks.sort((a, b) => b.ts - a.ts);
+          console.log('Sorted tasks:', sortedTasks);
+          setTasks(sortedTasks);
+        }
       });
-  }, [searchQuery]);
+    }, [searchQuery, activeWorkspace])
+  );
 
   const handleSelect = (item) => {
-    navigation.navigate('Chat', { taskId: item.id });
+    navigation.navigate('ChatTab', {
+      screen: 'ChatDetail',
+      params: { task: item },
+    });
   };
 
   return (

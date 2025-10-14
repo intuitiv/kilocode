@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3000';
+import { getServerUrl } from '../config';
 
 const stream = async (url, body, onMessage, onError, onComplete, onTaskId) => {
   try {
@@ -56,7 +56,7 @@ const stream = async (url, body, onMessage, onError, onComplete, onTaskId) => {
 };
 
 export const startNewTask = (message, onMessage, onError, onComplete, onTaskId) => {
-  const url = `${BASE_URL}/new-task`;
+  const url = `${getServerUrl()}/new-task`;
   const body = { message };
   stream(url, body, onMessage, onError, onComplete, onTaskId);
 };
@@ -66,7 +66,7 @@ export const sendFollowup = (taskId, message, onMessage, onError, onComplete) =>
     console.error('No task ID available to send a followup.');
     return;
   }
-  const url = `${BASE_URL}/send-followup`;
+  const url = `${getServerUrl()}/send-followup`;
   const body = { taskId, message };
   stream(url, body, onMessage, onError, onComplete);
 };
@@ -74,7 +74,7 @@ export const sendFollowup = (taskId, message, onMessage, onError, onComplete) =>
 export const cancelTask = async (taskId) => {
   if (taskId) {
     try {
-      await fetch(`${BASE_URL}/cancel-task`, {
+      await fetch(`${getServerUrl()}/cancel-task`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ export const cancelTask = async (taskId) => {
 
 export const getTasks = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/tasks`);
+    const response = await fetch(`${getServerUrl()}/tasks`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -99,7 +99,7 @@ export const getTasks = async () => {
 
 export const getTaskHistory = async (id) => {
   try {
-    const response = await fetch(`${BASE_URL}/tasks/${id}`);
+    const response = await fetch(`${getServerUrl()}/tasks/${id}`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching task history:', error);
@@ -109,7 +109,7 @@ export const getTaskHistory = async (id) => {
 
 export const getModes = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/modes`);
+    const response = await fetch(`${getServerUrl()}/modes`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching modes:', error);
@@ -120,10 +120,24 @@ export const getModes = async () => {
 export const getCurrentMode = async (id) => {
   if (!id) return null;
   try {
-    const response = await fetch(`${BASE_URL}/current-mode/${id}`);
+    const response = await fetch(`${getServerUrl()}/current-mode/${id}`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching current mode:', error);
     return null;
+  }
+};
+
+export const setMode = async (mode) => {
+  try {
+    await fetch(`${getServerUrl()}/modes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ mode }),
+    });
+  } catch (error) {
+    console.error('Error setting mode:', error);
   }
 };

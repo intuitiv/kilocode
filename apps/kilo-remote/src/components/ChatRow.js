@@ -29,14 +29,14 @@ const ChatRow = ({ item, onSuggestionPress }) => {
 
             while ((match = codeBlockRegex.exec(item.text)) !== null) {
               if (match.index > lastIndex) {
-                parts.push(<TextMessage key={lastIndex} text={item.text.substring(lastIndex, match.index)} />);
+                parts.push(<TextMessage key={lastIndex} text={item.text.substring(lastIndex, match.index)} sender={item.sender} />);
               }
               parts.push(<CodeBlock key={match.index} language={match[1]} code={match[2]} />);
               lastIndex = match.index + match[0].length;
             }
 
             if (lastIndex < item.text.length) {
-              parts.push(<TextMessage key={lastIndex} text={item.text.substring(lastIndex)} />);
+              parts.push(<TextMessage key={lastIndex} text={item.text.substring(lastIndex)} sender={item.sender} />);
             }
 
             return parts;
@@ -45,7 +45,7 @@ const ChatRow = ({ item, onSuggestionPress }) => {
           case 'completion_result':
             return <CompletionResultMessage item={item} />;
           default:
-            return <TextMessage text={item.text} />;
+            return <TextMessage text={item.text} sender={item.sender} />;
           case 'checkpoint_saved':
             return <CheckpointMessage item={item} />;
         }
@@ -65,10 +65,10 @@ const ChatRow = ({ item, onSuggestionPress }) => {
           case 'command':
             return <CommandMessage item={item} />;
           default:
-            return <TextMessage text={item.text} />;
+            return <TextMessage text={item.text} sender={item.sender} />;
         }
       default:
-        return <TextMessage text={item.text} />;
+        return <TextMessage text={item.text} sender={item.sender} />;
     }
   };
 

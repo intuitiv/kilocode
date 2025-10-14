@@ -186,7 +186,7 @@ const sampleMessages = [
 
 app.get('/health', (req, res) => {
   console.log('GET /health');
-  res.json({ status: 'ok', workspacePath: '/Users/sainath/PycharmProjects/kilocode/kilocode' });
+  res.json({ status: 'ok', workspacePath: '/Users/sainath/AdhocProjects/ai-studio-organiser' });
 });
 
 app.get('/modes', (req, res) => {
@@ -215,10 +215,7 @@ app.get('/tasks/:taskId', (req, res) => {
   console.log(`GET /tasks/${taskId}`);
   const task = sampleTasks.find(t => t.id === taskId);
   if (task) {
-    res.json({
-      historyItem: task,
-      apiConversationHistory: sampleMessages,
-    });
+    res.json(sampleMessages);
   } else {
     res.status(404).json({ error: 'Task not found' });
   }

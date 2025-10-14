@@ -1,76 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Markdown from 'react-native-markdown-display';
+import { useTheme } from '../../hooks/useTheme';
+import { getFileOperationMessageStyles } from '../../styles/messages';
+import { getRandomVariant } from '../../utils/style-utils';
+import { messageStyles } from '../../styles/messages';
 
 const FileOperationMessage = ({ item }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { theme } = useTheme();
+  const styles = useMemo(() => getFileOperationMessageStyles(theme), [theme]);
   const operation = JSON.parse(item.text);
   const { tool, path, diff, content } = operation || {};
 
-  const renderHeader = () => {
+  const headerInfo = useMemo(() => {
+    let styleKey;
     switch (tool) {
       case 'readFile':
-        return { icon: 'eye', text: '📁 Kilo code wants to read a file' };
+        styleKey = 'readFile';
+        break;
       case 'appliedDiff':
-        return { icon: 'edit', text: '✏️ Kilo code wants to edit this file' };
+        styleKey = 'updatedFile';
+        break;
       case 'newFileCreated':
-        return { icon: 'file', text: '🆕 Kilo code wants to create a new file' };
+        styleKey = 'createdFile';
+        break;
       default:
-        return { icon: 'file-text-o', text: 'Kilo code operation' };
+        return { text: 'Kilo code operation' };
     }
-  };
-
-  const header = renderHeader();
+    const text = getRandomVariant(messageStyles[styleKey]?.variants)?.replace(
+      /<filename>/g,
+      path
+    );
+    return { text };
+  }, [tool, path]);
 
   return (
-    <View className="p-2 my-1 mx-2 rounded-lg bg-gray-200 self-start">
-      {/* Header */}
-      <View className="flex-row items-center mb-1">
-        {/* <Icon name={header.icon} size={20} color="black" /> */}
-        <Text style={{ fontSize: 16, fontWeight: '700',}}>
-          {header.text}
-        </Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>{headerInfo.text}</Text>
       </View>
 
-      {/* Path */}
       {path && (
         <TouchableOpacity
           onPress={() => setIsExpanded(!isExpanded)}
-          className="ml-4"
+          style={styles.pathContainer}
         >
-          <Markdown
-            style={{
-              code_inline: {
-                backgroundColor: '#f0f0f0',
-                padding: 2,
-                borderRadius: 4,
-                fontSize: 14,
-              },
-            }}
-          >
-            {`\`${path}\``}
-          </Markdown>
+          <Markdown style={styles.markdownPath}>{`\`${path}\``}</Markdown>
         </TouchableOpacity>
       )}
 
-      {/* Expanded Content */}
       {isExpanded && (
-        <View className="mt-2 ml-4">
-          {diff && <Markdown>{`\`\`\`diff\n${diff}\n\`\`\``}</Markdown>}
-          {content && !diff && <Markdown>{`\`\`\`\n${content}\n\`\`\``}</Markdown>}
+        <View style={styles.contentContainer}>
+          {diff && <Markdown style={styles.markdownContent}>{`\`\`\`diff\n${diff}\n\`\`\``}</Markdown>}
+          {content && !diff && <Markdown style={styles.markdownContent}>{`\`\`\`\n${content}\n\`\`\``}</Markdown>}
         </View>
       )}
-
-      {/* Approve / Reject */}
-      {/* <View className="flex-row mt-2">
-        <TouchableOpacity className="bg-blue-500 rounded-lg p-2 mr-2">
-          <Text className="text-white">Approve</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="bg-red-500 rounded-lg p-2">
-          <Text className="text-white">Reject</Text>
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 };

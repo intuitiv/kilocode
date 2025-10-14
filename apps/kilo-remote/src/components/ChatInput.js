@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RNPickerSelect from 'react-native-picker-select';
+import { useTheme } from '../hooks/useTheme';
+import { getChatInputStyles } from './styles';
 
 const modes = [
-  { label: 'Architect', value: 'Architect' },
-  { label: 'Code', value: 'Code' },
-  { label: 'Ask', value: 'Ask' },
-  { label: 'Debug', value: 'Debug' },
-  { label: 'Orchestrator', value: 'Orchestrator' },
-  { label: 'Translate', value: 'Translate' },
-  { label: 'Test', value: 'Test' },
+  { label: 'Architect', value: 'architect' },
+  { label: 'Code', value: 'code' },
+  { label: 'Ask', value: 'ask' },
+  { label: 'Debug', value: 'debug' },
+  { label: 'Orchestrator', value: 'orchestrator' },
+  { label: 'Translate', value: 'translate' },
+  { label: 'Test', value: 'test' },
 ];
 
 const ChatInput = ({
@@ -20,41 +22,22 @@ const ChatInput = ({
   handleSend,
   handleCancel,
   inputRef,
+  mode,
+  onModeChange,
 }) => {
-  const [selectedMode, setSelectedMode] = useState('Architect');
+  const { theme } = useTheme();
+  const styles = getChatInputStyles(theme);
 
   return (
-    <View
-      style={{
-        padding: 8,
-        borderWidth: 1,
-        borderColor: '#3b82f6', // Outer border color
-        borderRadius: 10,
-        margin: 8,
-        backgroundColor: 'white',
-      }}
-    >
-      {/* Text Input (no border even when focused) */}
+    <View style={styles.container}>
       <TextInput
         ref={inputRef}
         value={inputValue}
         onChangeText={setInputValue}
         placeholder="Type a message..."
-        placeholderTextColor="grey"
+        placeholderTextColor={theme.dim}
         multiline
-        style={{
-          borderWidth: 0, // no visible border
-          outlineStyle: 'none', // prevent outline in web builds
-          padding: 10,
-          minHeight: 60,
-          textAlignVertical: 'top',
-        }}
-        onFocus={(e) => {
-          // prevent border or highlight on focus (Android/iOS-safe)
-          e.target?.setNativeProps?.({
-            style: { borderWidth: 0, outlineStyle: 'none' },
-          });
-        }}
+        style={styles.textInput}
         onKeyPress={(e) => {
           if (e.nativeEvent.key === 'Enter' && e.nativeEvent.metaKey) {
             handleSend();
@@ -62,61 +45,33 @@ const ChatInput = ({
         }}
       />
 
-      {/* Mode dropdown and Send/Cancel buttons */}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 8,
-        }}
-      >
-        <View style={{ width: 130 }}>
+      <View style={styles.bottomBar}>
+        <View style={styles.pickerContainer}>
           <RNPickerSelect
-            onValueChange={(value) => setSelectedMode(value)}
+            onValueChange={(value) => onModeChange(value)}
             items={modes}
-            value={selectedMode}
+            value={mode}
+            placeholder={{ label: 'Default', value: null }}
             useNativeAndroidPickerStyle={false}
-            style={{
-              inputIOS: {
-                fontSize: 14,
-                paddingVertical: 8,
-                paddingHorizontal: 10,
-                borderWidth: 1,
-                borderColor: '#9ca3af',
-                borderRadius: 6,
-                color: 'black',
-                backgroundColor: 'white',
-              },
-              inputAndroid: {
-                fontSize: 14,
-                paddingHorizontal: 10,
-                paddingVertical: 8,
-                borderWidth: 0.5,
-                borderColor: '#9ca3af',
-                borderRadius: 6,
-                color: 'black',
-                backgroundColor: 'white',
-              },
-            }}
+            style={styles.picker}
             Icon={() => (
               <Icon
                 name="chevron-down"
                 size={18}
-                color="gray"
-                style={{ paddingRight: 8 }}
+                color={theme.dim}
+                style={styles.icon}
               />
             )}
           />
         </View>
 
         {isStreaming ? (
-          <TouchableOpacity onPress={handleCancel} style={{ padding: 8 }}>
-            <Icon name="stop" size={22} color="red" />
+          <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
+            <Icon name="stop" size={22} style={styles.cancelIcon} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={handleSend} style={{ padding: 8 }}>
-            <Icon name="send" size={22} color="#3b82f6" />
+          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+            <Icon name="send" size={22} style={styles.sendIcon} />
           </TouchableOpacity>
         )}
       </View>

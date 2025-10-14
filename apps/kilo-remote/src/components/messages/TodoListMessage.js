@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
+import { useTheme } from "../../hooks/useTheme";
+import { getTodoListMessageStyles } from "../styles";
 
 const TodoListMessage = ({ item }) => {
   const [todos, setTodos] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const { theme } = useTheme();
+  const styles = getTodoListMessageStyles(theme);
 
   useEffect(() => {
     try {
@@ -17,11 +21,11 @@ const TodoListMessage = ({ item }) => {
   const getColor = (status) => {
     switch (status) {
       case "completed":
-        return "#03993A";
+        return theme.success;
       case "in_progress":
-        return "#E9B824";
+        return theme.warning;
       default:
-        return "#1E293B";
+        return theme.primaryText;
     }
   };
 
@@ -31,42 +35,25 @@ const TodoListMessage = ({ item }) => {
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .replace(/\*(.*?)\*/g, "$1");
 
-  // Find the in-progress task
   const inProgressTask = todos.find((t) => t.status === "in_progress");
-
-  // Decide which tasks to show
   const visibleTodos = showAll ? todos : inProgressTask ? [inProgressTask] : [];
 
   return (
     <View>
-      <Text style={{ fontSize: 16, fontWeight: "700" }}>📝 Todo List updated</Text>
+      <Text style={styles.title}>📝 Todo List updated</Text>
 
       {visibleTodos.map((t) => (
         <Text
           key={t.id}
-          style={{
-            color: getColor(t.status),
-            fontSize: 14,
-            marginVertical: 2,
-            marginLeft: 16,
-            lineHeight: 20,
-          }}
+          style={[styles.task, { color: getColor(t.status) }]}
         >
           {cleanText(t.content)}
         </Text>
       ))}
 
-      {/* Only show toggle if there are multiple todos */}
       {todos.length > 1 && (
         <TouchableOpacity onPress={() => setShowAll(!showAll)}>
-          <Text
-            style={{
-              color: "#2563EB",
-              marginLeft: 16,
-              marginTop: 6,
-              fontSize: 13,
-            }}
-          >
+          <Text style={styles.toggleButton}>
             {showAll ? "Hide tasks ▲" : "Show all tasks ▼"}
           </Text>
         </TouchableOpacity>

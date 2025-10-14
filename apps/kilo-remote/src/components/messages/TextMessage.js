@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { View, Text } from 'react-native';
 import Markdown from 'react-native-markdown-display';
+import { useTheme } from '../../hooks/useTheme';
+import { getTextMessageStyles } from '../../styles/messages';
+import { getRandomVariant } from '../../utils/style-utils';
+import { messageStyles } from '../../styles/messages';
 
-const TextMessage = ({ text }) => {
+const TextMessage = ({ text, sender }) => {
+  const { theme } = useTheme();
+  const styles = useMemo(() => getTextMessageStyles(theme), [theme]);
+
+  const kiloGreeting = useMemo(() => {
+    if (sender === 'user') {
+      return null;
+    }
+    return getRandomVariant(messageStyles.kiloSpeaks.variants);
+  }, [sender]);
+
   return (
-    <Markdown
-      style={{
-        code_inline: {
-          backgroundColor: '#f0f0f0',
-          padding: 2,
-          borderRadius: 4,
-        },
-      }}
-    >
-      {text}
-    </Markdown>
+    <View>
+      {kiloGreeting && <Text style={styles.kiloGreeting}>{kiloGreeting}</Text>}
+      <Markdown style={sender === 'user' ? styles.userMessage : styles.kiloMessage}>
+        {text}
+      </Markdown>
+    </View>
   );
 };
 
