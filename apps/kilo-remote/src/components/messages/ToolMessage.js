@@ -1,16 +1,20 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useTheme } from '../../hooks/useTheme';
+import { getToolMessageStyles } from '../../styles';
+import MessageCard from './MessageCard';
 
 const ToolMessage = ({ item }) => {
+  const { theme } = useTheme();
+  const styles = getToolMessageStyles(theme);
   const tool = JSON.parse(item.text);
+
   return (
-    <View className="p-2 my-1 mx-2 rounded-lg bg-gray-200 self-start">
-      <View className="flex-row items-center">
-        <Icon name="wrench" size={20} color="black" />
-        <Text className="font-bold ml-2">Tool: {tool.tool}</Text>
-      </View>
-    </View>
+    <MessageCard
+      headerIcon={<Icon name="wrench" size={20} style={styles.icon} />}
+      headerText={`Tool: ${tool.tool}`}
+    />
   );
 };
 

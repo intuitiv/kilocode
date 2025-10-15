@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { getTodoListMessageStyles } from "../../styles";
+import MessageCard from "./MessageCard";
+import { Feather } from "@expo/vector-icons";
 
 const TodoListMessage = ({ item }) => {
   const [todos, setTodos] = useState([]);
@@ -39,9 +41,10 @@ const TodoListMessage = ({ item }) => {
   const visibleTodos = showAll ? todos : inProgressTask ? [inProgressTask] : [];
 
   return (
-    <View>
-      <Text style={styles.title}>📝 Todo List updated</Text>
-
+    <MessageCard
+      headerIcon={<Feather name="check-square" size={18} style={styles.icon} />}
+      headerText="Todo List updated"
+    >
       {visibleTodos.map((t) => (
         <Text
           key={t.id}
@@ -58,7 +61,7 @@ const TodoListMessage = ({ item }) => {
           </Text>
         </TouchableOpacity>
       )}
-    </View>
+    </MessageCard>
   );
 };
 

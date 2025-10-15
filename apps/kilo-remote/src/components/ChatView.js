@@ -157,7 +157,6 @@ const ChatView = ({ route }) => {
           )}
           contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
           showsVerticalScrollIndicator={true}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
         />
       </KeyboardAvoidingView>
 

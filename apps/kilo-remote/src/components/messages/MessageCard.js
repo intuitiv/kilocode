@@ -9,7 +9,7 @@ const MessageCard = ({ headerIcon, headerText, children, onHeaderPress }) => {
 
   const Header = () => (
     <View style={styles.header}>
-      {headerIcon}
+      <View style={styles.icon}>{headerIcon}</View>
       <Text style={styles.headerText}>{headerText}</Text>
     </View>
   );

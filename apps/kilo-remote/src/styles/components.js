@@ -5,10 +5,13 @@ export const getChatInputStyles = (theme) => {
     container: {
       padding: 8,
       borderWidth: 1,
-      borderColor: theme.accent,
+      borderColor: theme.border || theme.dim,
       borderRadius: 10,
       margin: 8,
-      backgroundColor: theme.background,
+      backgroundColor: theme.cardBackground || theme.background,
+      shadowColor: theme.shadow || '#000',
+      shadowOpacity: 0.12,
+      shadowRadius: 4,
     },
     textInput: {
       borderWidth: 0,
@@ -37,7 +40,7 @@ export const getChatInputStyles = (theme) => {
         borderColor: theme.dim,
         borderRadius: 6,
         color: theme.primaryText,
-        backgroundColor: theme.background,
+        backgroundColor: theme.cardBackground,
       },
       inputAndroid: {
         fontSize: 14,
@@ -47,7 +50,7 @@ export const getChatInputStyles = (theme) => {
         borderColor: theme.dim,
         borderRadius: 6,
         color: theme.primaryText,
-        backgroundColor: theme.background,
+        backgroundColor: theme.cardBackground,
       },
     },
     icon: {
@@ -57,7 +60,7 @@ export const getChatInputStyles = (theme) => {
       padding: 8,
     },
     sendIcon: {
-      color: theme.accent,
+      color: theme.accent, // magenta action color
     },
     cancelButton: {
       padding: 8,
@@ -73,11 +76,14 @@ export const getHeaderTitleStyles = (theme) => {
     title: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: theme.primaryText,
+      color: theme.primary,
+      textShadowColor: theme.borderActive || 'transparent',
+      textShadowOffset: { width: 0, height: 0 },
+      textShadowRadius: 4,
     },
     subtitle: {
       fontSize: 12,
-      color: theme.dim,
+      color: theme.secondaryText,
     },
   });
 };
@@ -95,17 +101,17 @@ export const getHomeScreenStyles = (theme) => {
       fontSize: 24,
       fontWeight: 'bold',
       marginBottom: 20,
-      color: theme.primaryText,
+      color: theme.primary,
     },
     input: {
       width: '100%',
       height: 50,
-      borderColor: theme.dim,
+      borderColor: theme.border,
       borderWidth: 1,
       borderRadius: 10,
       paddingHorizontal: 10,
       marginBottom: 20,
-      backgroundColor: theme.background,
+      backgroundColor: theme.cardBackground,
       color: theme.primaryText,
     },
     button: {
@@ -117,7 +123,7 @@ export const getHomeScreenStyles = (theme) => {
       borderRadius: 10,
     },
     buttonText: {
-      color: 'white',
+      color: '#fff',
       fontSize: 18,
       fontWeight: 'bold',
     },
@@ -127,12 +133,12 @@ export const getHomeScreenStyles = (theme) => {
 export const getApiRequestMessageStyles = (theme) => {
   return StyleSheet.create({
     headerText: {
-      color: theme.dim,
+      color: theme.highlight,
       fontSize: 17,
       fontWeight: '600',
     },
     icon: {
-      color: theme.dim,
+      color: theme.highlight,
       fontSize: 17,
     },
     content: {
@@ -142,7 +148,8 @@ export const getApiRequestMessageStyles = (theme) => {
       paddingHorizontal: 8,
       borderRadius: 6,
       borderWidth: 1,
-      borderColor: theme.dim,
+      borderColor: theme.border,
+      backgroundColor: theme.cardBackground,
     },
     codeText: {
       fontFamily: 'Menlo',
@@ -155,11 +162,15 @@ export const getApiRequestMessageStyles = (theme) => {
 export const getCommandMessageStyles = (theme) => {
   return StyleSheet.create({
     icon: {
-      color: theme.primaryText,
+      color: theme.accent,
     },
     commandBox: {
       paddingHorizontal: 16,
       paddingVertical: 10,
+      backgroundColor: theme.cardBackground,
+      borderColor: theme.border,
+      borderWidth: 1,
+      borderRadius: 8,
     },
     commandText: {
       fontFamily: 'monospace',
@@ -176,7 +187,7 @@ export const getCommandMessageStyles = (theme) => {
     },
     footerText: {
       marginLeft: 6,
-      color: theme.dim,
+      color: theme.secondaryText,
       fontSize: 12,
     },
   });
@@ -185,10 +196,10 @@ export const getCommandMessageStyles = (theme) => {
 export const getKiloSaidMessageStyles = (theme) => {
   return StyleSheet.create({
     icon: {
-      color: theme.primaryText,
+      color: theme.secondary,
     },
     body: {
-      color: theme.secondary,
+      color: theme.secondaryText,
     },
     code_inline: {
       backgroundColor: theme.codeBlocks,
@@ -202,7 +213,7 @@ export const getKiloSaidMessageStyles = (theme) => {
 export const getKiloQuestionMessageStyles = (theme) => {
   return StyleSheet.create({
     icon: {
-      color: theme.primaryText,
+      color: theme.primary,
     },
     markdownContainer: {
       marginLeft: 2,
@@ -219,33 +230,60 @@ export const getKiloQuestionMessageStyles = (theme) => {
       marginTop: 8,
     },
     suggestionButton: {
-      borderColor: theme.dim,
+      borderColor: theme.border,
       borderWidth: 1,
       borderRadius: 6,
       paddingVertical: 8,
       paddingHorizontal: 10,
       marginBottom: 6,
+      backgroundColor: theme.cardBackground,
     },
     suggestionText: {
-      color: theme.primaryText,
+      color: theme.highlight,
     },
   });
 };
 
-
+export const getReadFileMessageStyles = (theme) => {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: theme.codeBlocks,
+    },
+    icon: {
+      color: theme.primaryText,
+    },
+    headerText: {
+      color: theme.primaryText,
+    },
+    pathText: {
+      color: theme.secondary,
+    },
+    approveButton: {
+      backgroundColor: theme.accent,
+    },
+    approveButtonText: {
+      color: '#ffffff',
+    },
+    rejectButton: {
+      backgroundColor: theme.error,
+    },
+    rejectButtonText: {
+      color: '#ffffff',
+    },
+  });
+};
 
 export const getTodoListMessageStyles = (theme) => {
   return StyleSheet.create({
-    title: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: theme.primaryText,
+    icon: {
+      color: theme.primary,
     },
     task: {
       fontSize: 14,
       marginVertical: 2,
       marginLeft: 16,
       lineHeight: 20,
+      color: theme.primaryText,
     },
     toggleButton: {
       color: theme.accent,
@@ -270,7 +308,7 @@ export const getCompletionResultMessageStyles = (theme) => {
       marginBottom: 4,
     },
     markdownBullet: {
-      color: theme.primaryText,
+      color: theme.secondaryText,
     },
     markdownListItem: {
       color: theme.primaryText,
@@ -290,10 +328,10 @@ export const getCheckpointMessageStyles = (theme) => {
       alignItems: 'center',
     },
     icon: {
-      color: theme.accent,
+      color: theme.highlight,
     },
     text: {
-      color: theme.accent,
+      color: theme.highlight,
       fontWeight: '600',
       marginHorizontal: 6,
     },
@@ -301,6 +339,7 @@ export const getCheckpointMessageStyles = (theme) => {
       flex: 1,
       height: 2,
       borderRadius: 1,
+      backgroundColor: theme.border,
     },
   });
 };
@@ -308,17 +347,17 @@ export const getCheckpointMessageStyles = (theme) => {
 export const getTaskItemStyles = (theme) => {
   return StyleSheet.create({
     card: {
-      backgroundColor: theme.background,
+      backgroundColor: theme.cardBackground,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: theme.dim,
+      borderColor: theme.border,
       padding: 14,
       marginHorizontal: 12,
       marginVertical: 8,
-      shadowColor: '#000',
-      shadowOpacity: 0.05,
+      shadowColor: theme.shadow || '#000',
+      shadowOpacity: 0.08,
       shadowRadius: 4,
-      elevation: 2,
+      elevation: 3,
     },
     titleRow: {
       flexDirection: 'row',
@@ -338,7 +377,7 @@ export const getTaskItemStyles = (theme) => {
     },
     metaText: {
       fontSize: 14,
-      color: theme.dim,
+      color: theme.secondaryText,
     },
     tokenRow: {
       flexDirection: 'row',
@@ -351,11 +390,11 @@ export const getTaskItemStyles = (theme) => {
     },
     tokenLabel: {
       fontWeight: '500',
-      color: theme.primaryText,
+      color: theme.secondaryText,
     },
     tokenTotal: {
       fontWeight: '700',
-      color: theme.accent,
+      color: theme.highlight,
     },
     costRow: {
       flexDirection: 'row',
@@ -364,7 +403,7 @@ export const getTaskItemStyles = (theme) => {
     costText: {
       fontSize: 15,
       fontWeight: '600',
-      color: theme.success,
+      color: theme.costText || theme.highlight,
     },
     icon: {
       marginRight: 8,
@@ -381,12 +420,13 @@ export const getPinnedMessageStyles = (theme) => {
       flexDirection: 'row',
       alignItems: 'center',
       padding: 10,
-      backgroundColor: theme.background,
+      backgroundColor: theme.cardBackground,
       borderBottomWidth: 1,
-      borderBottomColor: theme.dim,
+      borderBottomColor: theme.border,
     },
     icon: {
       marginRight: 10,
+      color: theme.highlight,
     },
     text: {
       fontSize: 18,
@@ -408,12 +448,13 @@ export const getChatViewStyles = (theme) => {
       bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor: theme.background,
+      backgroundColor: theme.cardBackground,
       borderTopWidth: 1,
-      borderTopColor: theme.dim,
+      borderTopColor: theme.border,
     },
   });
 };
+
 export const modeStyles = {
   architect: {
     accent: '#FF4473',
@@ -452,29 +493,30 @@ export const fontSizes = {
   large: 20,
   xlarge: 24,
 };
+
 export const getTextMessageStyles = (theme) => ({
   userMessage: {
     body: {
       fontSize: 18,
       fontWeight: 'bold',
-      color: theme.text,
+      color: theme.primaryText,
     },
   },
   kiloMessage: {
     body: {
-      color: theme.secondary,
+      color: theme.secondaryText,
     },
     code_inline: {
-      backgroundColor: theme.codeBackground,
-      color: theme.codeText,
+      backgroundColor: theme.codeBlocks,
+      color: theme.primaryText,
       padding: 2,
       borderRadius: 4,
     },
   },
   kiloGreeting: {
-    color: theme.text,
+    color: theme.primaryText,
     marginBottom: 8,
-    opacity: 0.7,
+    opacity: 0.85,
   },
 });
 
@@ -485,20 +527,29 @@ export const textTreatments = {
     textShadowRadius: 8,
   }),
 };
+
 export const getMessageCardStyles = (theme) => {
   return StyleSheet.create({
     card: {
       backgroundColor: theme.background,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: theme.dim,
+      borderColor: theme.accent,
       padding: 14,
       marginHorizontal: 12,
       marginVertical: 8,
-      shadowColor: '#000',
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
+
+      // ✨ Neon glow magic:
+      shadowColor: theme.accent,
+      shadowOpacity: 0.9,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 0 },
+
+      // Web + Android fallback
       elevation: 2,
+      ...(true
+        ? { filter: `drop-shadow(0 0 1px ${theme.accent})` }
+        : {}),
     },
     header: {
       flexDirection: 'row',
@@ -512,14 +563,18 @@ export const getMessageCardStyles = (theme) => {
       flexShrink: 1,
     },
     icon: {
-      marginRight: 8,
+      marginRight: 12,
+      color: theme.accent,
     },
     body: {
       marginTop: 8,
     },
   });
 };
+
+
 export const getCodeBlockStyles = (theme) => {
+  // NOTE: These are CSS-in-JS style shapes meant for markdown renderers that accept style objects.
   return StyleSheet.create({
     icon: {
       color: theme.primaryText,
@@ -590,20 +645,56 @@ export const getCodeBlockStyles = (theme) => {
     },
   });
 };
+
 export const getFileOperationMessageStyles = (theme) => {
   return StyleSheet.create({
-    icon: {
+    container: {
+      padding: 8,
+      marginVertical: 4,
+      marginHorizontal: 8,
+      borderRadius: 8,
+      backgroundColor: theme.cardBackground,
+      alignSelf: 'flex-start',
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    headerText: {
+      fontSize: 16,
+      fontWeight: '700',
       color: theme.primaryText,
     },
     pathContainer: {
       marginLeft: 16,
     },
-    pathText: {
-      color: theme.secondary,
+    markdownPath: {
+      code_inline: {
+        backgroundColor: theme.codeBlocks,
+        color: theme.primaryText,
+        padding: 2,
+        borderRadius: 4,
+      },
     },
     contentContainer: {
       marginTop: 8,
       marginLeft: 16,
+    },
+    markdownContent: {
+      body: {
+        color: theme.primaryText,
+      },
+    },
+  });
+};
+
+export const getToolMessageStyles = (theme) => {
+  return StyleSheet.create({
+    icon: {
+      color: theme.primaryText,
     },
   });
 };
