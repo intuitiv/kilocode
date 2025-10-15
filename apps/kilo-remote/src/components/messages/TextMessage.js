@@ -2,9 +2,10 @@ import React, { useMemo } from 'react';
 import { View, Text } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useTheme } from '../../hooks/useTheme';
-import { getTextMessageStyles } from '../../styles/messages';
+import { getTextMessageStyles } from '../../styles';
 import { getRandomVariant } from '../../utils/style-utils';
-import { messageStyles } from '../../styles/messages';
+import { messageStyles } from '../../styles';
+import MessageCard from './MessageCard';
 
 const TextMessage = ({ text, sender }) => {
   const { theme } = useTheme();
@@ -17,13 +18,20 @@ const TextMessage = ({ text, sender }) => {
     return getRandomVariant(messageStyles.kiloSpeaks.variants);
   }, [sender]);
 
-  return (
-    <View>
-      {kiloGreeting && <Text style={styles.kiloGreeting}>{kiloGreeting}</Text>}
-      <Markdown style={sender === 'user' ? styles.userMessage : styles.kiloMessage}>
+  if (sender === 'user') {
+    return (
+      <Markdown style={styles.userMessage}>
         {text}
       </Markdown>
-    </View>
+    );
+  }
+
+  return (
+    <MessageCard headerText={kiloGreeting}>
+      <Markdown style={styles.kiloMessage}>
+        {text}
+      </Markdown>
+    </MessageCard>
   );
 };
 

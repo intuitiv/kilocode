@@ -4,18 +4,17 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Markdown from 'react-native-markdown-display';
 import { useTheme } from '../../hooks/useTheme';
 import { getCompletionResultMessageStyles } from '../../styles';
+import MessageCard from './MessageCard';
 
 const CompletionResultMessage = ({ item }) => {
   const { theme } = useTheme();
   const styles = getCompletionResultMessageStyles(theme);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Icon name="check-circle" size={20} color={theme.success} />
-        <Text style={styles.headerText}>Task Complete!</Text>
-      </View>
-
+    <MessageCard
+      headerIcon={<Icon name="check-circle" size={20} style={styles.icon} />}
+      headerText="Task Complete!"
+    >
       <Markdown
         style={{
           body: styles.markdownBody,
@@ -27,7 +26,7 @@ const CompletionResultMessage = ({ item }) => {
       >
         {item.text}
       </Markdown>
-    </View>
+    </MessageCard>
   );
 };
 

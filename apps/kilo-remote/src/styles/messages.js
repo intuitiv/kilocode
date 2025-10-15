@@ -52,69 +52,18 @@ export const messageStyles = {
   },
 };
 
-export const getTextMessageStyles = (theme) => ({
-  userMessage: {
-    body: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: theme.text,
-    },
-  },
-  kiloMessage: {
-    body: {
-      color: theme.text,
-    },
-    code_inline: {
-      backgroundColor: theme.codeBackground,
-      color: theme.codeText,
-      padding: 2,
-      borderRadius: 4,
-    },
-  },
-  kiloGreeting: {
-    color: theme.text,
-    marginBottom: 8,
-    opacity: 0.7,
-  },
-});
+export const ambientLines = [
+  'CPU dreams in assembly...',
+  'Listening to the hum of electrons...',
+  'Awaiting next directive, Commander 🧑‍💻',
+  'Recalibrating neural cores...',
+  'Memory map synchronized.',
+];
 
-export const getFileOperationMessageStyles = (theme) => ({
-  container: {
-    padding: 8,
-    marginVertical: 4,
-    marginHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: theme.secondaryBackground,
-    alignSelf: 'flex-start',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.primaryText,
-  },
-  pathContainer: {
-    marginLeft: 16,
-  },
-  markdownPath: {
-    code_inline: {
-      backgroundColor: theme.codeBackground,
-      color: theme.codeText,
-      padding: 2,
-      borderRadius: 4,
-    },
-  },
-  contentContainer: {
-    marginTop: 8,
-    marginLeft: 16,
-  },
-  markdownContent: {
-    body: {
-      color: theme.text,
-    },
-  },
-});
+export const modeTransitionTexts = {
+  Architect: '🧩 Architect Mode engaged — drafting blueprints...',
+  Code: '💻 Code Mode active — logic streaming...',
+  Debug: '🕵️ Debug Mode initiated — scanning for anomalies...',
+  Todo: '📋 Task Mode online — managing operations...',
+  Explain: '🧠 Explain Mode enabled — decoding complexity...',
+};

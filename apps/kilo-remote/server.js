@@ -171,12 +171,6 @@ const sampleMessages = [
         "partial": false
     },
     {
-        "ts": 1761000041000,
-        "type": "ask",
-        "ask": "completion_result",
-        "text": ""
-    },
-    {
         "ts": 1761000042000,
         "type": "say",
         "say": "text",

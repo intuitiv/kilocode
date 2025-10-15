@@ -1,15 +1,20 @@
+// theme.js
 export const darkTheme = {
-  background: '#1E1E1E',
-  primary: '#FF4473',
-  secondary: '#78DCAA',
-  dim: '#B3B3B3',
+  background: '#081108', // deep dark green base
+  backgroundGradient: ['#081108', '#0E1B12', '#14291B'], // subtle immersive depth
+  primary: '#50FA7B', // bright neon green for headings & accents
+  secondary: '#78DCAA', // softer mint green for body text
+  dim: '#586b61', // muted green-gray for borders and metadata
   warning: '#FFD166',
   highlight: '#66FCF1',
   error: '#FF5555',
   success: '#50FA7B',
-  codeBlocks: '#2d2d2d',
-  primaryText: '#78DCAA',
-  accent: '#FF4473',
+  codeBlocks: '#0C1A10', // slightly lighter background for code
+  primaryText: '#C4FCDC', // readable bright greenish text
+  accent: '#50FA7B', // active controls / icons
+  commandHighlight: '#f08d49',
+  secondaryText: '#67cdcc',
+
   fonts: {
     main: 'JetBrainsMono-Regular',
     title: 'Orbitron-Regular',
@@ -20,7 +25,7 @@ export const darkTheme = {
 
 export const lightTheme = {
   background: '#F5F7FA',
-  primary: '#FF4473',
+  primary: '#50FA7B',
   secondary: '#2D6A4F',
   dim: '#212529',
   warning: '#FFD166',
@@ -30,6 +35,8 @@ export const lightTheme = {
   codeBlocks: '#E9ECEF',
   primaryText: '#212529',
   accent: '#2D6A4F',
+  commandHighlight: '#f08d49',
+  secondaryText: '#67cdcc',
   fonts: {
     main: 'JetBrainsMono-Regular',
     title: 'Orbitron-Regular',

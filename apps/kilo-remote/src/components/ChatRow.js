@@ -7,7 +7,6 @@ import CheckpointMessage from './messages/CheckpointMessage';
 import ApiRequestMessage from './messages/ApiRequestMessage';
 import KiloQuestionMessage from './messages/KiloQuestionMessage';
 import TodoListMessage from './messages/TodoListMessage';
-import ReadFileMessage from './messages/ReadFileMessage';
 import FileOperationMessage from './messages/FileOperationMessage';
 import CommandMessage from './messages/CommandMessage';
 import CompletionResultMessage from './messages/CompletionResultMessage';

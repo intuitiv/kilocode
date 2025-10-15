@@ -4,6 +4,7 @@ import Markdown from 'react-native-markdown-display';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { getKiloQuestionMessageStyles } from '../../styles';
+import MessageCard from './MessageCard';
 
 const KiloQuestionMessage = ({ item, onSelect }) => {
   const { theme } = useTheme();
@@ -16,19 +17,12 @@ const KiloQuestionMessage = ({ item, onSelect }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons name="help-circle-outline" size={18} color={theme.primaryText} />
-        <Text style={styles.headerText}>
-          Kilo Code has a question
-        </Text>
-        {item.ts && (
-          <Text style={styles.time}>
-            {formatTime(item.ts)}
-          </Text>
-        )}
-      </View>
-
+    <MessageCard
+      headerIcon={
+        <Ionicons name="help-circle-outline" size={18} style={styles.icon} />
+      }
+      headerText="Kilo Code has a question"
+    >
       <View style={styles.markdownContainer}>
         <Markdown
           style={{
@@ -52,7 +46,7 @@ const KiloQuestionMessage = ({ item, onSelect }) => {
           ))}
         </View>
       </View>
-    </View>
+    </MessageCard>
   );
 };
 

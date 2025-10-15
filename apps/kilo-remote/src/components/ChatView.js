@@ -28,13 +28,13 @@ const ChatView = ({ route }) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [pinnedMessage, setPinnedMessage] = useState('');
-  const [mode, setMode] = useState('chat');
+  const [mode, setMode] = useState('architect');
   const { theme } = useTheme();
   const styles = getChatViewStyles(theme);
   const flatListRef = useRef(null);
   const inputRef = useRef(null);
 
-  const activeModeStyle = modeStyles[mode] || modeStyles.chat;
+  const activeModeStyle = modeStyles[mode] || modeStyles.architect;
 
   useFocusEffect(
     useCallback(() => {
@@ -57,7 +57,7 @@ const ChatView = ({ route }) => {
         setMessages([]);
         setCurrentTaskId(null);
         setPinnedMessage('');
-        setMode('chat');
+        setMode('architect');
       }
     }, [route.params?.task])
   );

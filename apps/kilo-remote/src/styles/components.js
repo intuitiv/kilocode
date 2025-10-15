@@ -126,20 +126,14 @@ export const getHomeScreenStyles = (theme) => {
 
 export const getApiRequestMessageStyles = (theme) => {
   return StyleSheet.create({
-    container: {
-      alignSelf: 'flex-start',
-      paddingVertical: 2,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 2,
-    },
     headerText: {
-      fontWeight: 'bold',
       color: theme.dim,
-      fontSize: 14,
-      marginLeft: 4,
+      fontSize: 17,
+      fontWeight: '600',
+    },
+    icon: {
+      color: theme.dim,
+      fontSize: 17,
     },
     content: {
       marginTop: 4,
@@ -160,28 +154,8 @@ export const getApiRequestMessageStyles = (theme) => {
 
 export const getCommandMessageStyles = (theme) => {
   return StyleSheet.create({
-    container: {
-      backgroundColor: theme.background,
-      borderColor: theme.dim,
-      borderWidth: 1,
-      borderRadius: 12,
-      marginVertical: 6,
-      overflow: 'hidden',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.codeBlocks,
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-      borderBottomColor: theme.dim,
-      borderBottomWidth: 1,
-    },
-    headerText: {
-      marginLeft: 6,
+    icon: {
       color: theme.primaryText,
-      fontWeight: '600',
-      fontSize: 14,
     },
     commandBox: {
       paddingHorizontal: 16,
@@ -210,20 +184,11 @@ export const getCommandMessageStyles = (theme) => {
 
 export const getKiloSaidMessageStyles = (theme) => {
   return StyleSheet.create({
-    container: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
     icon: {
       color: theme.primaryText,
     },
-    text: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: theme.primaryText,
-    },
-    markdownContainer: {
-      marginLeft: 16,
+    body: {
+      color: theme.secondary,
     },
     code_inline: {
       backgroundColor: theme.codeBlocks,
@@ -236,28 +201,11 @@ export const getKiloSaidMessageStyles = (theme) => {
 /* ✅ Single correct version of getKiloQuestionMessageStyles */
 export const getKiloQuestionMessageStyles = (theme) => {
   return StyleSheet.create({
-    container: {
-      borderRadius: 8,
-      alignSelf: 'flex-start',
-      paddingVertical: 4,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 4,
-    },
-    headerText: {
-      fontSize: 16,
-      fontWeight: '700',
+    icon: {
       color: theme.primaryText,
     },
-    time: {
-      marginLeft: 25,
-      color: theme.dim,
-      fontSize: 12,
-    },
     markdownContainer: {
-      marginLeft: 25,
+      marginLeft: 2,
     },
     markdownBody: {
       color: theme.primaryText,
@@ -285,34 +233,6 @@ export const getKiloQuestionMessageStyles = (theme) => {
 };
 
 
-export const getReadFileMessageStyles = (theme) => {
-  return StyleSheet.create({
-    container: {
-      backgroundColor: theme.codeBlocks,
-    },
-    icon: {
-      color: theme.primaryText,
-    },
-    headerText: {
-      color: theme.primaryText,
-    },
-    pathText: {
-      color: theme.primaryText,
-    },
-    approveButton: {
-      backgroundColor: theme.accent,
-    },
-    approveButtonText: {
-      color: 'white',
-    },
-    rejectButton: {
-      backgroundColor: theme.error,
-    },
-    rejectButtonText: {
-      color: 'white',
-    },
-  });
-};
 
 export const getTodoListMessageStyles = (theme) => {
   return StyleSheet.create({
@@ -338,25 +258,8 @@ export const getTodoListMessageStyles = (theme) => {
 
 export const getCompletionResultMessageStyles = (theme) => {
   return StyleSheet.create({
-    container: {
-      backgroundColor: theme.success,
-      borderColor: theme.success,
-      borderWidth: 1,
-      borderRadius: 10,
-      paddingVertical: 10,
-      paddingHorizontal: 12,
-      alignSelf: 'stretch',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 6,
-    },
-    headerText: {
-      fontWeight: '600',
-      color: theme.primaryText,
-      marginLeft: 8,
-      fontSize: 15,
+    icon: {
+      color: theme.success,
     },
     markdownBody: {
       color: theme.primaryText,
@@ -508,6 +411,199 @@ export const getChatViewStyles = (theme) => {
       backgroundColor: theme.background,
       borderTopWidth: 1,
       borderTopColor: theme.dim,
+    },
+  });
+};
+export const modeStyles = {
+  architect: {
+    accent: '#FF4473',
+    font: 'IBMPlexSerif-Regular',
+  },
+  code: {
+    accent: '#78DCAA',
+    font: 'JetBrainsMono-Regular',
+  },
+  debug: {
+    accent: '#FF5555',
+    font: 'VictorMono-Regular',
+  },
+  task: {
+    accent: '#50FA7B',
+    font: 'Inter-Regular',
+  },
+  explain: {
+    accent: '#FFD166',
+    font: 'Sora-Regular',
+  },
+};
+
+export const fonts = {
+  monospace: 'JetBrains Mono',
+  codingFuturistic: 'Victor Mono',
+  geometricSans: 'Sora',
+  modernSerif: 'IBM Plex Serif',
+  playfulNerdTitle: 'Orbitron',
+  alternativeNerdyTouch: 'Share Tech Mono',
+};
+
+export const fontSizes = {
+  small: 12,
+  medium: 16,
+  large: 20,
+  xlarge: 24,
+};
+export const getTextMessageStyles = (theme) => ({
+  userMessage: {
+    body: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+  },
+  kiloMessage: {
+    body: {
+      color: theme.secondary,
+    },
+    code_inline: {
+      backgroundColor: theme.codeBackground,
+      color: theme.codeText,
+      padding: 2,
+      borderRadius: 4,
+    },
+  },
+  kiloGreeting: {
+    color: theme.text,
+    marginBottom: 8,
+    opacity: 0.7,
+  },
+});
+
+export const textTreatments = {
+  neonGlow: (color) => ({
+    textShadowColor: color,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  }),
+};
+export const getMessageCardStyles = (theme) => {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: theme.background,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.dim,
+      padding: 14,
+      marginHorizontal: 12,
+      marginVertical: 8,
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 6,
+    },
+    headerText: {
+      fontSize: 17,
+      fontWeight: '600',
+      color: theme.primaryText,
+      flexShrink: 1,
+    },
+    icon: {
+      marginRight: 8,
+    },
+    body: {
+      marginTop: 8,
+    },
+  });
+};
+export const getCodeBlockStyles = (theme) => {
+  return StyleSheet.create({
+    icon: {
+      color: theme.primaryText,
+    },
+    codeStyle: {
+      'code[class*="language-"]': {
+        color: theme.primaryText,
+        background: 'none',
+        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+        fontSize: 14,
+        textAlign: 'left',
+        whiteSpace: 'pre',
+        wordSpacing: 'normal',
+        wordBreak: 'normal',
+        wordWrap: 'normal',
+        lineHeight: 1.5,
+        tabSize: 4,
+        hyphens: 'none',
+      },
+      'pre[class*="language-"]': {
+        color: theme.primaryText,
+        background: theme.codeBlocks || '#2d2d2d',
+        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+        fontSize: 14,
+        textAlign: 'left',
+        whiteSpace: 'pre',
+        wordSpacing: 'normal',
+        wordBreak: 'normal',
+        wordWrap: 'normal',
+        lineHeight: 1.5,
+        tabSize: 4,
+        hyphens: 'none',
+        padding: 10,
+        margin: 5,
+        overflow: 'auto',
+        borderRadius: 5,
+      },
+      ':not(pre) > code[class*="language-"]': {
+        background: theme.codeBlocks || '#2d2d2d',
+        padding: '.1em',
+        borderRadius: '.3em',
+        whiteSpace: 'normal',
+      },
+      comment: {
+        color: '#999',
+      },
+      'block-comment': {
+        color: '#999',
+      },
+      string: {
+        color: theme.success || '#7ec699',
+      },
+      keyword: {
+        color: theme.accent || '#cc99cd',
+      },
+      number: {
+        color: theme.warning || '#f08d49',
+      },
+      function: {
+        color: theme.secondary || '#67cdcc',
+      },
+      'class-name': {
+        color: theme.warning || '#f08d49',
+      },
+      punctuation: {
+        color: theme.primaryText,
+      },
+    },
+  });
+};
+export const getFileOperationMessageStyles = (theme) => {
+  return StyleSheet.create({
+    icon: {
+      color: theme.primaryText,
+    },
+    pathContainer: {
+      marginLeft: 16,
+    },
+    pathText: {
+      color: theme.secondary,
+    },
+    contentContainer: {
+      marginTop: 8,
+      marginLeft: 16,
     },
   });
 };

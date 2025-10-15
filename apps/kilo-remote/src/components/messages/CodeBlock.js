@@ -1,79 +1,32 @@
 import React from 'react';
-import SyntaxHighlighter from 'react-native-syntax-highlighter';
-import { useTheme } from '../../hooks/useTheme';
+import { View } from 'react-native';
+import CodeHighlighter from 'react-native-code-highlighter';
+import js from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
+import python from 'highlight.js/lib/languages/python';
+import 'highlight.js/styles/atom-one-dark.css'; // web-safe style
 
-const CodeBlock = ({ language, code }) => {
-  const { theme } = useTheme();
+const languageMap = {
+  js,
+  javascript: js,
+  json,
+  py: python,
+  python,
+};
 
-  const codeStyle = {
-    'code[class*="language-"]': {
-      color: theme.primaryText,
-      background: 'none',
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      fontSize: 14,
-      textAlign: 'left',
-      whiteSpace: 'pre',
-      wordSpacing: 'normal',
-      wordBreak: 'normal',
-      wordWrap: 'normal',
-      lineHeight: 1.5,
-      tabSize: 4,
-      hyphens: 'none',
-    },
-    'pre[class*="language-"]': {
-      color: theme.primaryText,
-      background: theme.codeBlocks || '#2d2d2d',
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      fontSize: 14,
-      textAlign: 'left',
-      whiteSpace: 'pre',
-      wordSpacing: 'normal',
-      wordBreak: 'normal',
-      wordWrap: 'normal',
-      lineHeight: 1.5,
-      tabSize: 4,
-      hyphens: 'none',
-      padding: 10,
-      margin: 5,
-      overflow: 'auto',
-      borderRadius: 5,
-    },
-    ':not(pre) > code[class*="language-"]': {
-      background: theme.codeBlocks || '#2d2d2d',
-      padding: '.1em',
-      borderRadius: '.3em',
-      whiteSpace: 'normal',
-    },
-    comment: {
-      color: '#999',
-    },
-    'block-comment': {
-      color: '#999',
-    },
-    string: {
-      color: theme.success || '#7ec699',
-    },
-    keyword: {
-      color: theme.accent || '#cc99cd',
-    },
-    number: {
-      color: theme.commandHighlight || '#f08d49',
-    },
-    function: {
-      color: theme.secondaryText || '#67cdcc',
-    },
-    'class-name': {
-      color: theme.commandHighlight || '#f08d49',
-    },
-    punctuation: {
-      color: theme.primaryText,
-    },
-  };
+const CodeBlock = ({ language = 'js', code = '' }) => {
+  const lang = languageMap[language] || js;
 
   return (
-    <SyntaxHighlighter language={language} style={codeStyle}>
-      {code}
-    </SyntaxHighlighter>
+    <View style={{ backgroundColor: '#1e1e1e', borderRadius: 8, padding: 10 }}>
+      <CodeHighlighter
+        hljsStyle="atom-one-dark"
+        language={lang}
+        textStyle={{ fontFamily: 'monospace', color: '#ccc' }}
+      >
+        {String(code)}
+      </CodeHighlighter>
+    </View>
   );
 };
 

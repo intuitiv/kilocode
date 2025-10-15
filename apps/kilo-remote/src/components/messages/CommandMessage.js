@@ -3,18 +3,17 @@ import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTheme } from '../../hooks/useTheme';
 import { getCommandMessageStyles } from '../../styles';
+import MessageCard from './MessageCard';
 
 const CommandMessage = ({ item }) => {
   const { theme } = useTheme();
   const styles = getCommandMessageStyles(theme);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Icon name="terminal" size={16} color={theme.primaryText} />
-        <Text style={styles.headerText}>Running</Text>
-      </View>
-
+    <MessageCard
+      headerIcon={<Icon name="terminal" size={16} style={styles.icon} />}
+      headerText="Running"
+    >
       <View style={styles.commandBox}>
         <Text style={styles.commandText}>{item.text}</Text>
       </View>
@@ -23,7 +22,7 @@ const CommandMessage = ({ item }) => {
         <Icon name="check" size={12} color={theme.dim} />
         <Text style={styles.footerText}>Auto-approved commands</Text>
       </View>
-    </View>
+    </MessageCard>
   );
 };
 
