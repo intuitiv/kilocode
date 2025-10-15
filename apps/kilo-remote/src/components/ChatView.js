@@ -11,8 +11,9 @@ import PinnedMessage from './PinnedMessage';
 import ChatInput from './ChatInput';
 import ChatRow from './ChatRow';
 import { useTheme } from '../hooks/useTheme';
-import { getChatViewStyles } from './styles';
-import { modeStyles } from '../styles/modes';
+import { getChatViewStyles, modeStyles } from '../styles';
+import AnimatedBackground from './AnimatedBackground';
+import { config } from '../config';
 import {
   startNewTask,
   sendFollowup,
@@ -135,6 +136,7 @@ const ChatView = ({ route }) => {
 
   return (
     <View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
+      <AnimatedBackground />
       <PinnedMessage message={pinnedMessage} />
       <KeyboardAvoidingView
         style={{ flex: 1 }}

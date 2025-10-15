@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTheme } from '../../hooks/useTheme';
-import { getReadFileMessageStyles } from '../styles';
+import { getReadFileMessageStyles } from '../../styles';
 
 const ReadFileMessage = ({ item }) => {
   const { theme } = useTheme();

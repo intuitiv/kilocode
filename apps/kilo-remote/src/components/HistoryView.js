@@ -2,34 +2,38 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TextInput } from 'react-native';
 import TaskItem from './history/TaskItem';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { getTasks } from '../services/api';
-import { getActiveWorkspace } from '../config';
+import { getTasks, checkHealth } from '../services/api';
+import { getActiveWorkspace, setActiveWorkspace } from '../config';
 
 const HistoryView = () => {
   const [tasks, setTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const activeWorkspace = getActiveWorkspace();
+  const [activeWorkspace, setActiveWorkspaceState] = useState(getActiveWorkspace());
   const navigation = useNavigation();
 
   useFocusEffect(
     useCallback(() => {
-      console.log('HistoryView focused');
-      console.log('activeWorkspace:', activeWorkspace);
-      getTasks().then((data) => {
-        if (data) {
-          console.log('All tasks from server:', data);
-          const filteredTasks = data.filter(
-            (task) =>
-              task.workspace === activeWorkspace &&
-              task.task.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-          console.log('Filtered tasks:', filteredTasks);
-          const sortedTasks = filteredTasks.sort((a, b) => b.ts - a.ts);
-          console.log('Sorted tasks:', sortedTasks);
-          setTasks(sortedTasks);
+      const fetchWorkspaceAndTasks = async () => {
+        const health = await checkHealth();
+        if (health.status === 'ok') {
+          setActiveWorkspace(health.workspacePath);
+          setActiveWorkspaceState(health.workspacePath);
+
+          const data = await getTasks();
+          if (data) {
+            const filteredTasks = data.filter(
+              (task) =>
+                task.workspace === health.workspacePath &&
+                task.task.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            const sortedTasks = filteredTasks.sort((a, b) => b.ts - a.ts);
+            setTasks(sortedTasks);
+          }
         }
-      });
-    }, [searchQuery, activeWorkspace])
+      };
+
+      fetchWorkspaceAndTasks();
+    }, [searchQuery])
   );
 
   const handleSelect = (item) => {

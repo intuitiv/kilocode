@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RNPickerSelect from 'react-native-picker-select';
 import { useTheme } from '../hooks/useTheme';
-import { getChatInputStyles } from './styles';
+import { getChatInputStyles } from '../styles';
 
 const modes = [
   { label: 'Architect', value: 'architect' },

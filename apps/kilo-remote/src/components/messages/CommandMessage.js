@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTheme } from '../../hooks/useTheme';
-import { getCommandMessageStyles } from '../styles';
+import { getCommandMessageStyles } from '../../styles';
 
 const CommandMessage = ({ item }) => {
   const { theme } = useTheme();

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTheme } from '../../hooks/useTheme';
-import { getApiRequestMessageStyles } from '../styles';
+import { getApiRequestMessageStyles } from '../../styles';
 
 const ApiRequestMessage = ({ item }) => {
   const [expanded, setExpanded] = useState(false);

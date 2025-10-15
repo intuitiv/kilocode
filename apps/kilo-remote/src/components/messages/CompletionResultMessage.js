@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Markdown from 'react-native-markdown-display';
 import { useTheme } from '../../hooks/useTheme';
-import { getCompletionResultMessageStyles } from '../styles';
+import { getCompletionResultMessageStyles } from '../../styles';
 
 const CompletionResultMessage = ({ item }) => {
   const { theme } = useTheme();

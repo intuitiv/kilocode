@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { setServerUrl, setWorkspacePath } from '../config';
 import { useTheme } from '../hooks/useTheme';
-import { getHomeScreenStyles } from './styles';
+import { getHomeScreenStyles } from '../styles';
 
 const HomeScreen = ({ navigation }) => {
   const [url, setUrl] = useState('http://localhost:3000');

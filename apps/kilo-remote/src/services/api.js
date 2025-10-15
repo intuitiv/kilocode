@@ -141,3 +141,13 @@ export const setMode = async (mode) => {
     console.error('Error setting mode:', error);
   }
 };
+
+export const checkHealth = async () => {
+  try {
+    const response = await fetch(`${getServerUrl()}/health`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking health:', error);
+    return { status: 'error', workspacePath: '' };
+  }
+};

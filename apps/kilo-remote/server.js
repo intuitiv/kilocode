@@ -182,6 +182,20 @@ const sampleMessages = [
         "say": "text",
         "text": "This is a Kilo said message."
     },
+    {
+        "ts": 1760453594184,
+        "type": "ask",
+        "ask": "tool",
+        "text": "{\"tool\":\"switchMode\",\"mode\":\"code\",\"reason\":\"I have a clear plan and need to start implementing the code changes.\"}",
+        "isProtected": false
+    },
+    // {
+    //     "ts": 1760453606540,
+    //     "type": "ask",
+    //     "ask": "tool",
+    //     "text": "{\"tool\":\"listFilesTopLevel\",\"path\":\"apps/kilo-remote/src/styles\",\"isOutsideWorkspace\":false,\"content\":\"ambient.js\n animations.js\nmessages.js\nmodes.js\ntext-treatments.js\ntheme.js\ntransitions.js\ntypography.js\"}",
+    //     "isProtected": false
+    // }
 ];
 
 app.get('/health', (req, res) => {

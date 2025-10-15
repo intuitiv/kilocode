@@ -15,7 +15,7 @@ export const darkTheme = {
     title: 'Orbitron-Regular',
     architect: 'IBMPlexSerif-Regular',
     medium: 'System',
-  }
+  },
 };
 
 export const lightTheme = {
@@ -35,5 +35,5 @@ export const lightTheme = {
     title: 'Orbitron-Regular',
     architect: 'IBMPlexSerif-Regular',
     medium: 'System',
-  }
+  },
 };

@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../../hooks/useTheme";
-import { getCheckpointMessageStyles } from "../styles";
+import { getCheckpointMessageStyles } from "../../styles";
 
 const CheckpointMessage = ({ item }) => {
   const { theme } = useTheme();

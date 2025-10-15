@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
-import { getKiloQuestionMessageStyles } from '../styles';
+import { getKiloQuestionMessageStyles } from '../../styles';
 
 const KiloQuestionMessage = ({ item, onSelect }) => {
   const { theme } = useTheme();

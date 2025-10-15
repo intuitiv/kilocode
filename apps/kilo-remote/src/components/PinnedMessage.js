@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useTheme } from '../hooks/useTheme';
-import { getPinnedMessageStyles } from './styles';
+import { getPinnedMessageStyles } from '../styles';
 
 const PinnedMessage = ({ message }) => {
   const { theme } = useTheme();

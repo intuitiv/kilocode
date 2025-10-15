@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
-import { getKiloSaidMessageStyles } from '../styles';
+import { getKiloSaidMessageStyles } from '../../styles';
 
 const KiloSaidMessage = ({ item }) => {
   const { theme } = useTheme();

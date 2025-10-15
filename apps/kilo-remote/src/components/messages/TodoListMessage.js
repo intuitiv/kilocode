@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
-import { getTodoListMessageStyles } from "../styles";
+import { getTodoListMessageStyles } from "../../styles";
 
 const TodoListMessage = ({ item }) => {
   const [todos, setTodos] = useState([]);

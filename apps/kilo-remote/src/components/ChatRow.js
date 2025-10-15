@@ -54,7 +54,8 @@ const ChatRow = ({ item, onSuggestionPress }) => {
           case 'followup':
             return <KiloQuestionMessage item={item} onSelect={onSuggestionPress} />;
           case 'tool':
-            const tool = JSON.parse(item.text);
+            console.log(item.text)
+            const tool = JSON.parse(item.text.replace(/\n/g, "\\n"));
             if (tool.tool === 'updateTodoList') {
               return <TodoListMessage item={item} />;
             }
