@@ -1,58 +1,64 @@
 import { getServerUrl } from '../config';
+import EventSource from 'react-native-event-source';
 
-const stream = async (url, body, onMessage, onError, onComplete, onTaskId) => {
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
+  // EventSource requires the URL to include query params for POST data,
+  // which is not standard but how this library and many servers handle it.
+  // A better approach would be a proper SSE library that supports POST bodies.
+  // Given the constraints, we will assume the server can handle this or we will adjust the server.
+  // For now, let's just use the library as intended.
+  // The library does not support POST body, so we will send the data as query params.
+  // This is a limitation of the library.
+  const fullUrl = new URL(url);
+  if (body.taskId) fullUrl.searchParams.append('taskId', body.taskId);
+  if (body.message) fullUrl.searchParams.append('message', body.message);
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-    let eventType = null;
+  // The library also does not allow custom headers for the initial POST.
+  // We are switching to GET request as is standard for EventSource.
+  // The server will need to be adapted to handle GET requests for these endpoints.
+  const eventSource = new EventSource(fullUrl.toString());
 
-    const read = async () => {
-      const { done, value } = await reader.read();
-      if (done) {
-        if (onComplete) onComplete();
-        return;
-      }
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop(); // Keep the last, possibly incomplete line
+  eventSource.addEventListener('open', () => {
+    console.log('SSE connection opened.');
+  });
 
-      for (const line of lines) {
-        if (line.startsWith('event:')) {
-          eventType = line.substring(6).trim();
-        } else if (line.startsWith('data:')) {
-          const data = line.substring(5).trim();
-          if (data) {
-            if (eventType === 'taskId') {
-              const taskId = JSON.parse(data).taskId;
-              if (onTaskId) {
-                onTaskId(taskId);
-              }
-            } else {
-              onMessage(JSON.parse(data));
-            }
-          }
-        } else if (line === '') {
-          // End of event
-          eventType = null;
-        }
-      }
-      read();
-    };
+  eventSource.addEventListener('message', (event) => {
+    if (event.type === 'message') {
+      onMessage(JSON.parse(event.data));
+    }
+  });
 
-    read();
-  } catch (error) {
-    console.error('Error streaming messages:', error);
-    if (onError) onError(error);
-  }
+  eventSource.addEventListener('done', () => {
+    console.log('SSE stream finished.');
+    if (onComplete) onComplete();
+    eventSource.close();
+  });
+
+  eventSource.addEventListener('taskId', (event) => {
+    const taskId = JSON.parse(event.data).taskId;
+    if (onTaskId) {
+      onTaskId(taskId);
+    }
+  });
+
+  eventSource.addEventListener('error', (error) => {
+    // The 'error' event is fired when the connection is closed by the server,
+    // or for actual network errors. We don't want to call onError for a graceful close.
+    if (error.type === 'error') {
+      console.error('SSE error:', error);
+      if (onError) onError(error);
+    }
+    eventSource.close();
+  });
+
+  // Note: There is no explicit 'onComplete' for SSE other than the server closing the connection,
+  // which triggers an error. We use the error handler to signify completion.
+
+  // Return a function to cancel the stream
+  return () => {
+    eventSource.close();
+    if (onComplete) onComplete();
+  };
 };
 
 export const startNewTask = (message, onMessage, onError, onComplete, onTaskId) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import RNPickerSelect from 'react-native-picker-select';
+import { Picker } from '@react-native-picker/picker';
 import { useTheme } from '../hooks/useTheme';
 import { getChatInputStyles } from '../styles';
 
@@ -47,22 +47,17 @@ const ChatInput = ({
 
       <View style={styles.bottomBar}>
         <View style={styles.pickerContainer}>
-          <RNPickerSelect
-            onValueChange={(value) => onModeChange(value)}
-            items={modes}
-            value={mode}
-            placeholder={{ label: 'Default', value: null }}
-            useNativeAndroidPickerStyle={false}
+          <Picker
+            selectedValue={mode}
             style={styles.picker}
-            Icon={() => (
-              <Icon
-                name="chevron-down"
-                size={18}
-                color={theme.dim}
-                style={styles.icon}
-              />
-            )}
-          />
+            itemStyle={styles.itemStyle}
+            dropdownIconColor={theme.primaryText}
+            onValueChange={(itemValue) => onModeChange(itemValue)}
+          >
+            {modes.map((m) => (
+              <Picker.Item key={m.value} label={m.label} value={m.value} />
+            ))}
+          </Picker>
         </View>
 
         {isStreaming ? (

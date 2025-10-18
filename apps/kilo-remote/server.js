@@ -130,7 +130,7 @@ const sampleMessages = [
         "ts": 1761000015000,
         "type": "ask",
         "ask": "followup",
-        "text": "{\"question\":\"To format the time nicely, I recommend using the `date-fns` library. Is it okay to install it?\",\"suggest\":[{\"answer\":\"Yes, go ahead and install `date-fns`.\"},{\"answer\":\"No, use the native `Date` object without external libraries.\"}]}"
+        "text": "{\"question\":\"To format the time nicely, I recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?recommend using the `date-fns` library. Is it okay to install it?\",\"suggest\":[{\"answer\":\"Yes, go ahead and install `date-fns`.\"},{\"answer\":\"No, use the native `Date` object without external libraries.\"}]}"
     },
     {
         "ts": 1761000020000,
@@ -229,9 +229,9 @@ app.get('/tasks/:taskId', (req, res) => {
   }
 });
 
-app.post('/new-task', (req, res) => {
+app.get('/new-task', (req, res) => {
   const taskId = crypto.randomUUID();
-  console.log(`POST /new-task, message: "${req.body.message}". Responding with taskId: ${taskId}`);
+  console.log(`GET /new-task, message: "${req.query.message}". Responding with taskId: ${taskId}`);
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -252,6 +252,8 @@ app.post('/new-task', (req, res) => {
       res.write(`data: ${JSON.stringify(message)}\n\n`);
       setTimeout(() => sendEvent(index + 1), 250);
     } else {
+      res.write('event: done\n');
+      res.write('data: {}\n\n');
       res.end();
     }
   };
@@ -263,9 +265,9 @@ app.post('/new-task', (req, res) => {
   });
 });
 
-app.post('/send-followup', (req, res) => {
-  const { taskId, message } = req.body;
-  console.log(`POST /send-followup for task ${taskId}: "${message}"`);
+app.get('/send-followup', (req, res) => {
+  const { taskId, message } = req.query;
+  console.log(`GET /send-followup for task ${taskId}: "${message}"`);
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -281,6 +283,8 @@ app.post('/send-followup', (req, res) => {
       res.write(`data: ${JSON.stringify(message)}\n\n`);
       setTimeout(() => sendEvent(index + 1), 250);
     } else {
+      res.write('event: done\n');
+      res.write('data: {}\n\n');
       res.end();
     }
   };

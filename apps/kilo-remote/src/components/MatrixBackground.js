@@ -9,17 +9,19 @@ import Animated, {
   interpolate,
   Extrapolate,
 } from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
+import { useTheme } from '../hooks/useTheme'; // hook for theme access
 
 const { width, height } = Dimensions.get('window');
 const COLUMN_COUNT = 20;
-const SYMBOLS = 'アァカサタナハマヤャラワン0123457890ABCDEFGHIJKLMNOPQRSTUVWXYZ$@#%&*+-';
+const SYMBOLS = 'アァカサタナハマヤャラワン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$@#%&*+-';
 
 const randomSymbol = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
 
 const MatrixColumn = ({ index }) => {
   const progress = useSharedValue(0);
-  const speed = 4000 + Math.random() * 4000; // each column falls at different speed
-  const delay = Math.random() * 4000;        // stagger start times
+  const speed = 4000 + Math.random() * 4000; // different speeds
+  const delay = Math.random() * 4000; // staggered starts
 
   useEffect(() => {
     progress.value = withDelay(
@@ -57,7 +59,9 @@ const MatrixColumn = ({ index }) => {
           key={i}
           style={[
             styles.symbol,
-            { color: i === columnSymbols.length - 1 ? '#CCFF99' : '#00FF41' },
+            {
+              color: i === columnSymbols.length - 1 ? '#4DF4C0' : '#78DCAA', // use theme greens
+            },
           ]}
         >
           {sym}
@@ -68,11 +72,34 @@ const MatrixColumn = ({ index }) => {
 };
 
 const MatrixBackground = () => {
+  const { theme } = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.background },
+      ]}
+    >
+      {/* Falling code columns */}
       {Array.from({ length: COLUMN_COUNT }).map((_, i) => (
         <MatrixColumn key={i} index={i} />
       ))}
+
+      {/* Frosted glass overlay */}
+      <BlurView
+        intensity={15}
+        tint="dark"
+        style={StyleSheet.absoluteFill}
+      />
+
+      {/* Slight translucent overlay for text readability */}
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: 'rgba(8, 17, 8, 0.25)' }, // matches theme.background
+        ]}
+      />
     </View>
   );
 };
@@ -80,7 +107,6 @@ const MatrixBackground = () => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'black',
     zIndex: -1,
     flexDirection: 'row',
   },
@@ -91,11 +117,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   symbol: {
-    fontSize: 16,
+    fontSize: 8,
     fontWeight: 'bold',
-    textShadowColor: '#00FF41',
+    textShadowColor: '#4DF4C0',
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    textShadowRadius: 6,
   },
 });
 

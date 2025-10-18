@@ -10,6 +10,8 @@ import TodoListMessage from './messages/TodoListMessage';
 import FileOperationMessage from './messages/FileOperationMessage';
 import CommandMessage from './messages/CommandMessage';
 import CompletionResultMessage from './messages/CompletionResultMessage';
+import ToolMessage from './messages/ToolMessage';
+import SwitchModeMessage from './messages/SwitchModeMessage';
 
 const ChatRow = ({ item, onSuggestionPress }) => {
   const renderContent = () => {
@@ -28,14 +30,14 @@ const ChatRow = ({ item, onSuggestionPress }) => {
 
             while ((match = codeBlockRegex.exec(item.text)) !== null) {
               if (match.index > lastIndex) {
-                parts.push(<TextMessage key={lastIndex} text={item.text.substring(lastIndex, match.index)} sender={item.sender} />);
+                parts.push(<TextMessage key={lastIndex} item={item} text={item.text.substring(lastIndex, match.index)} />);
               }
               parts.push(<CodeBlock key={match.index} language={match[1]} code={match[2]} />);
               lastIndex = match.index + match[0].length;
             }
 
             if (lastIndex < item.text.length) {
-              parts.push(<TextMessage key={lastIndex} text={item.text.substring(lastIndex)} sender={item.sender} />);
+              parts.push(<TextMessage key={lastIndex} item={item} text={item.text.substring(lastIndex)} />);
             }
 
             return parts;
@@ -44,7 +46,7 @@ const ChatRow = ({ item, onSuggestionPress }) => {
           case 'completion_result':
             return <CompletionResultMessage item={item} />;
           default:
-            return <TextMessage text={item.text} sender={item.sender} />;
+            return <TextMessage item={item} text={item.text} />;
           case 'checkpoint_saved':
             return <CheckpointMessage item={item} />;
         }
@@ -61,19 +63,22 @@ const ChatRow = ({ item, onSuggestionPress }) => {
             if (tool.tool === 'readFile' || tool.tool === 'appliedDiff' || tool.tool === 'newFileCreated') {
               return <FileOperationMessage item={item} />;
             }
-            return <ApiRequestMessage item={item} />;
+            if (tool.tool === 'switchMode') {
+              return <SwitchModeMessage item={item} />;
+            }
+            return <ToolMessage item={item} />;
           case 'command':
             return <CommandMessage item={item} />;
           default:
-            return <TextMessage text={item.text} sender={item.sender} />;
+            return <TextMessage item={item} text={item.text} />;
         }
       default:
-        return <TextMessage text={item.text} sender={item.sender} />;
+        return <TextMessage item={item} text={item.text} />;
     }
   };
 
   return (
-    <View key={item.ts} className={`p-2 my-1 mx-2 rounded-lg ${item.sender === 'user' ? 'bg-primary self-end' : 'bg-gray-200 self-start'}`} style={{ marginBottom: 12 }}>
+    <View key={item.ts} className={`p-2 my-1 mx-2 rounded-lg ${item.sender === 'user' ? 'bg-primary self-end' : 'bg-gray-200 self-start'}`} style={{ marginBottom: 4 }}>
       {renderContent()}
     </View>
   );

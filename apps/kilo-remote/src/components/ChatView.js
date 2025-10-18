@@ -5,6 +5,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import PinnedMessage from './PinnedMessage';
@@ -12,7 +13,9 @@ import ChatInput from './ChatInput';
 import ChatRow from './ChatRow';
 import { useTheme } from '../hooks/useTheme';
 import { getChatViewStyles, modeStyles } from '../styles';
-import AnimatedBackground from './AnimatedBackground';
+import MatrixBackground from './MatrixBackground';
+import ArchitectureBackground from './ArchitectureBackground';
+import DefaultBackground from './DefaultBackground';
 import { config } from '../config';
 import {
   startNewTask,
@@ -29,7 +32,7 @@ const ChatView = ({ route }) => {
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [pinnedMessage, setPinnedMessage] = useState('');
   const [mode, setMode] = useState('architect');
-  const { theme } = useTheme();
+  const { theme, setExpandedMessageId } = useTheme();
   const styles = getChatViewStyles(theme);
   const flatListRef = useRef(null);
   const inputRef = useRef(null);
@@ -63,6 +66,17 @@ const ChatView = ({ route }) => {
   );
 
   const onMessage = (newMessage) => {
+    if (newMessage.type === 'ask' && newMessage.ask === 'tool') {
+      try {
+        const tool = JSON.parse(newMessage.text);
+        if (tool.tool === 'switchMode' && tool.mode) {
+          setMode(tool.mode);
+        }
+      } catch (e) {
+        console.error('Error parsing tool message:', e);
+      }
+    }
+
     if (newMessage.partial) {
       setMessages((prevMessages) => {
         const newMessages = [...prevMessages];
@@ -113,9 +127,7 @@ const ChatView = ({ route }) => {
     setInputValue('');
     setIsStreaming(true);
 
-    if (!currentTaskId) {
-      setPinnedMessage(inputValue);
-    }
+    setPinnedMessage(inputValue);
 
     const onTaskId = (taskId) => {
       console.log('onTaskId callback received taskId:', taskId);
@@ -134,30 +146,39 @@ const ChatView = ({ route }) => {
     setIsStreaming(false);
   };
 
+  const backgroundMap = {
+    code: <MatrixBackground />,
+    architect: <ArchitectureBackground />,
+  };
+
+  const BackgroundComponent = backgroundMap[mode] || <DefaultBackground />;
+
   return (
     <View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
-      <AnimatedBackground />
+      {BackgroundComponent}
       <PinnedMessage message={pinnedMessage} />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item, index) => `${item.ts}-${index}`}
-          renderItem={({ item }) => (
-            <ChatRow
-              item={item}
-              onSuggestionPress={(suggestion) => {
-                setInputValue(suggestion);
-              }}
-            />
-          )}
-          contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
-          showsVerticalScrollIndicator={true}
-        />
+        <TouchableWithoutFeedback onPress={() => setExpandedMessageId(null)}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={(item, index) => `${item.ts}-${index}`}
+            renderItem={({ item }) => (
+              <ChatRow
+                item={item}
+                onSuggestionPress={(suggestion) => {
+                  setInputValue(suggestion);
+                }}
+              />
+            )}
+            contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
+            showsVerticalScrollIndicator={true}
+          />
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
       <View style={styles.inputContainer}>

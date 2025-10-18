@@ -18,7 +18,7 @@ const CompletionResultMessage = ({ item }) => {
       <Markdown
         style={{
           body: styles.markdownBody,
-          paragraph: styles.markdownParagraph,
+          paragraph: { margin: 0 },
           bullet_list_icon: styles.markdownBullet,
           list_item: styles.markdownListItem,
           code_inline: styles.code_inline,

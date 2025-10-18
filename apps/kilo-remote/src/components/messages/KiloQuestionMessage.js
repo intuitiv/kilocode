@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
@@ -7,14 +7,50 @@ import { getKiloQuestionMessageStyles } from '../../styles';
 import MessageCard from './MessageCard';
 
 const KiloQuestionMessage = ({ item, onSelect }) => {
-  const { theme } = useTheme();
+  const { theme, isVerbose, expandedMessageId, setExpandedMessageId } = useTheme();
+  const isExpanded = expandedMessageId === item.ts;
   const styles = getKiloQuestionMessageStyles(theme);
   const question = JSON.parse(item.text);
 
-  const formatTime = (ts) => {
-    const date = new Date(ts);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const handlePress = () => {
+    setExpandedMessageId(isExpanded ? null : item.ts);
   };
+
+  if (!isVerbose) {
+    return (
+      <TouchableWithoutFeedback onPress={() => { /* Stop propagation */ }}>
+        <MessageCard>
+          <TouchableOpacity onPress={handlePress}>
+            <View style={styles.markdownContainer}>
+              <View style={!isExpanded && { maxHeight: 65, overflow: 'hidden' }}>
+                <Markdown
+                  style={{
+                    body: styles.markdownBody,
+                    code_inline: styles.code_inline,
+                    paragraph: { margin: 0 },
+                  }}
+                >
+                  {question.question}
+                </Markdown>
+              </View>
+              <View style={styles.answersContainer}>
+                {question.suggest.map((suggestion, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => onSelect?.(suggestion.answer)}
+                    activeOpacity={0.7}
+                    style={styles.suggestionButton}
+                  >
+                    <Text style={styles.suggestionText}>{suggestion.answer}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </TouchableOpacity>
+        </MessageCard>
+      </TouchableWithoutFeedback>
+    );
+  }
 
   return (
     <MessageCard
@@ -28,6 +64,7 @@ const KiloQuestionMessage = ({ item, onSelect }) => {
           style={{
             body: styles.markdownBody,
             code_inline: styles.code_inline,
+            paragraph: { margin: 0 },
           }}
         >
           {question.question}

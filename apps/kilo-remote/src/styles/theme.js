@@ -21,7 +21,7 @@ export const darkTheme = {
 
   // ---- Text Colors ----
   primaryText: '#CFFFE7', // bright readable text
-  secondaryText: '#A6CDB9', // softer contrast for metadata
+  secondaryText: '#FFFFFF', // softer contrast for metadata
   subduedText: '#647E70', // tertiary text
 
   // ---- Effects / Border ----

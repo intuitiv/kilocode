@@ -6,8 +6,18 @@ import { getCommandMessageStyles } from '../../styles';
 import MessageCard from './MessageCard';
 
 const CommandMessage = ({ item }) => {
-  const { theme } = useTheme();
+  const { theme, isVerbose } = useTheme();
   const styles = getCommandMessageStyles(theme);
+
+  if (!isVerbose) {
+    return (
+      <MessageCard>
+        <View style={styles.commandBox}>
+          <Text style={styles.commandText}>$ {'>'} {item.text}</Text>
+        </View>
+      </MessageCard>
+    );
+  }
 
   return (
     <MessageCard

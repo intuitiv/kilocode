@@ -12,7 +12,7 @@ const PinnedMessage = ({ message }) => {
 
   return (
     <View style={styles.container}>
-      <Icon name="thumb-tack" size={16} color={theme.dim} style={styles.icon} />
+      {/* <Icon name="thumb-tack" size={16} color={theme.dim} style={styles.icon} /> */}
       <Text style={styles.text}>{message}</Text>
     </View>
   );

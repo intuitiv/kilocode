@@ -5,6 +5,8 @@ export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isVerbose, setIsVerbose] = useState(false);
+  const [expandedMessageId, setExpandedMessageId] = useState(null);
 
   const theme = useMemo(() => (isDarkMode ? darkTheme : lightTheme), [isDarkMode]);
 
@@ -12,8 +14,12 @@ export const ThemeProvider = ({ children }) => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const toggleVerbose = () => {
+    setIsVerbose(!isVerbose);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, isDarkMode, toggleTheme, isVerbose, toggleVerbose, expandedMessageId, setExpandedMessageId }}>
       {children}
     </ThemeContext.Provider>
   );

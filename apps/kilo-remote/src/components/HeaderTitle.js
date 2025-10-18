@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { getWorkspacePath, getServerUrl } from '../config';
 import { useTheme } from '../hooks/useTheme';
 import { getHeaderTitleStyles } from '../styles';
+import VerboseToggle from './VerboseToggle';
 
 const HeaderTitle = () => {
   const { theme } = useTheme();
@@ -13,10 +14,19 @@ const HeaderTitle = () => {
   const url = getServerUrl();
 
   return (
-    <View>
-      <Text style={styles.title}>{folder}</Text>
-      <Text style={styles.subtitle}>{fullPath}</Text>
-      <Text style={styles.subtitle}>{url}</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 0 }}>
+      <Text
+        style= {styles.title}
+      >
+        {folder}
+      </Text>
+      <View style={{ marginLeft: 16 }}>
+        <VerboseToggle />
+      </View>
+      {/* <Text style={styles.subtitle}>{fullPath}</Text> */}
+      {/* <Text style={styles.url}>
+        {url}
+      </Text> */}
     </View>
   );
 };
