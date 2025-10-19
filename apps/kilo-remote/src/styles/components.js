@@ -2,34 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 export const getChatInputStyles = (theme) => {
-  const pickerSelectStyles = {
-    inputIOS: {
-      fontSize: 14,
-      paddingVertical: 8,
-      paddingHorizontal: 10,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 4,
-      color: theme.accent,
-      paddingRight: 30, // to ensure the text is never behind the icon
-    },
-    inputAndroid: {
-      fontSize: 14,
-      paddingHorizontal: 10,
-      paddingVertical: 8,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 4,
-      color: theme.accent,
-      paddingRight: 30,
-    },
-    iconContainer: {
-      top: 10,
-      right: 12,
-    },
-  };
-
-  const styles = StyleSheet.create({
+  return StyleSheet.create({
     container: {
       padding: 6, // compact
       borderWidth: 1,
@@ -60,8 +33,28 @@ export const getChatInputStyles = (theme) => {
       marginTop: 6,
     },
     pickerContainer: {
-      flex: 1,
+      width: 150,
       marginRight: 8,
+      zIndex: 1000, // Ensure it's above other elements
+    },
+    pickerStyle: {
+      backgroundColor: theme.background,
+      borderColor: theme.border,
+      borderWidth: 1,
+      paddingVertical: 2, // Aggressive height control
+      minHeight: 0, // Override default min height
+    },
+    dropDownContainerStyle: {
+      backgroundColor: theme.cardBackground,
+      borderColor: theme.border,
+    },
+    labelStyle: {
+      color: theme.primary,
+      fontSize: 12, // Smaller font to reduce height
+    },
+    listItemLabelStyle: {
+      color: theme.primary,
+      fontSize: 12,
     },
     icon: {
       paddingRight: 6,
@@ -81,8 +74,6 @@ export const getChatInputStyles = (theme) => {
       fontSize: 16,
     },
   });
-
-  return { ...styles, pickerSelectStyles };
 };
 
 export const getHeaderTitleStyles = (theme) => {
@@ -376,7 +367,8 @@ export const getCheckpointMessageStyles = (theme) => {
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 2,
+      paddingVertical: 4,
+      width: '100%',
     },
     icon: {
       color: theme.highlight,
@@ -392,7 +384,6 @@ export const getCheckpointMessageStyles = (theme) => {
       flex: 1,
       height: 2,
       borderRadius: 1,
-      backgroundColor: theme.border,
     },
   });
 };
@@ -476,6 +467,7 @@ export const getPinnedMessageStyles = (theme) => {
       backgroundColor: theme.cardBackground,
       borderBottomWidth: 1,
       borderBottomColor: theme.border,
+      marginTop: 10,
     },
     icon: {
       marginRight: 8,
@@ -586,14 +578,21 @@ export const textTreatments = {
 
 export const getMessageCardStyles = (theme) => {
   return StyleSheet.create({
+    gradientBorder: {
+      borderRadius: 7, // Outer radius
+      padding: 1, // This padding creates the border thickness
+      marginVertical: 3,
+      width: '100%',
+      shadowColor: theme.accent,
+      shadowOffset: { width: 0, height: 0 },
+      shadowRadius: 5,
+      shadowOpacity: 0.8,
+      elevation: 5,
+    },
     card: {
       backgroundColor: theme.background,
-      borderRadius: 6,
-      borderWidth: 1,
-      borderColor: theme.border,
+      borderRadius: 6, // Inner radius, slightly smaller
       padding: 4,
-      marginHorizontal: 6,
-      marginVertical: 3,
     },
     header: {
       flexDirection: 'row',
@@ -625,7 +624,7 @@ export const getCodeBlockStyles = (theme) => {
       'code[class*="language-"]': {
         color: theme.primaryText,
         background: 'none',
-        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+        fontFamily: 'monospace',
         fontSize: 13,
         textAlign: 'left',
         whiteSpace: 'pre',
@@ -639,7 +638,7 @@ export const getCodeBlockStyles = (theme) => {
       'pre[class*="language-"]': {
         color: theme.primaryText,
         background: theme.codeBlocks || '#2d2d2d',
-        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+        fontFamily: 'monospace',
         fontSize: 13,
         textAlign: 'left',
         whiteSpace: 'pre',

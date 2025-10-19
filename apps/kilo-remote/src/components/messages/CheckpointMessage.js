@@ -14,7 +14,7 @@ const CheckpointMessage = ({ item }) => {
       <Feather name="git-commit" size={16} style={styles.icon} />
       <Text style={styles.text}>Checkpoint</Text>
       <LinearGradient
-        colors={[theme.accent, "transparent"]}
+        colors={[theme.highlight, "transparent"]}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.gradient}

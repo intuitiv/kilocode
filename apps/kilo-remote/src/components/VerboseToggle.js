@@ -14,6 +14,7 @@ const VerboseToggle = () => {
         ios_backgroundColor={theme.dim}
         onValueChange={toggleVerbose}
         value={isVerbose}
+        style={{ transform: [{ scale: 0.8 }] }}
       />
     </View>
   );

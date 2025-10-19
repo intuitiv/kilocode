@@ -1,19 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import RNPickerSelect from 'react-native-picker-select';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { useTheme } from '../hooks/useTheme';
 import { getChatInputStyles } from '../styles';
-
-const modes = [
-  { label: 'Architect', value: 'architect' },
-  { label: 'Code', value: 'code' },
-  { label: 'Ask', value: 'ask' },
-  { label: 'Debug', value: 'debug' },
-  { label: 'Orchestrator', value: 'orchestrator' },
-  { label: 'Translate', value: 'translate' },
-  { label: 'Test', value: 'test' },
-];
 
 const ChatInput = ({
   inputValue,
@@ -26,7 +16,17 @@ const ChatInput = ({
   onModeChange,
 }) => {
   const { theme } = useTheme();
-  const { pickerSelectStyles, ...styles } = getChatInputStyles(theme);
+  const styles = getChatInputStyles(theme);
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([
+    { label: 'Architect', value: 'architect' },
+    { label: 'Code', value: 'code' },
+    { label: 'Ask', value: 'ask' },
+    { label: 'Debug', value: 'debug' },
+    { label: 'Orchestrator', value: 'orchestrator' },
+    { label: 'Translate', value: 'translate' },
+    { label: 'Test', value: 'test' },
+  ]);
 
   return (
     <View style={styles.container}>
@@ -47,16 +47,24 @@ const ChatInput = ({
 
       <View style={styles.bottomBar}>
         <View style={styles.pickerContainer}>
-          <RNPickerSelect
-            onValueChange={(value) => onModeChange(value)}
-            items={modes}
-            style={pickerSelectStyles}
+          <DropDownPicker
+            open={open}
             value={mode}
-            useNativeAndroidPickerStyle={false}
-            placeholder={{}}
-            Icon={() => {
-              return <Icon name="chevron-down" size={12} color={theme.dim} />;
-            }}
+            items={items}
+            setOpen={setOpen}
+            setValue={onModeChange}
+            setItems={setItems}
+            theme={theme.dark ? 'DARK' : 'LIGHT'}
+            style={styles.pickerStyle}
+            dropDownContainerStyle={styles.dropDownContainerStyle}
+            labelStyle={styles.labelStyle}
+            listItemLabelStyle={styles.listItemLabelStyle}
+            placeholder="Select a mode"
+            listMode="SCROLLVIEW"
+            zIndex={3000}
+            zIndexInverse={1000}
+            modal={true}
+            onBackdropPress={() => setOpen(false)}
           />
         </View>
 

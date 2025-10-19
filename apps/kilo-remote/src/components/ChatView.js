@@ -162,23 +162,22 @@ const ChatView = ({ route }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <TouchableWithoutFeedback onPress={() => setExpandedMessageId(null)}>
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            keyExtractor={(item, index) => `${item.ts}-${index}`}
-            renderItem={({ item }) => (
-              <ChatRow
-                item={item}
-                onSuggestionPress={(suggestion) => {
-                  setInputValue(suggestion);
-                }}
-              />
-            )}
-            contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
-            showsVerticalScrollIndicator={true}
-          />
-        </TouchableWithoutFeedback>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item, index) => `${item.ts}-${index}`}
+          renderItem={({ item }) => (
+            <ChatRow
+              item={item}
+              onSuggestionPress={(suggestion) => {
+                setInputValue(suggestion);
+              }}
+            />
+          )}
+          onScrollBeginDrag={() => setExpandedMessageId(null)}
+          contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
+          showsVerticalScrollIndicator={true}
+        />
       </KeyboardAvoidingView>
 
       <View style={styles.inputContainer}>

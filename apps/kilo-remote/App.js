@@ -8,6 +8,7 @@ import ChatView from './src/components/ChatView';
 import HistoryView from './src/components/HistoryView';
 import HomeScreen from './src/components/HomeScreen';
 import HeaderTitle from './src/components/HeaderTitle';
+import HeaderControls from './src/components/HeaderControls';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { useTheme } from './src/hooks/useTheme';
@@ -23,15 +24,6 @@ const MyTheme = {
   },
 };
 
-function DisconnectButton() {
-  const navigation = useNavigation();
-  const { theme } = useTheme();
-  return (
-    <TouchableOpacity onPress={() => navigation.navigate('Home')} style={{ marginRight: 15 }}>
-      <Icon name="power-off" size={24} color={theme.accent} />
-    </TouchableOpacity>
-  );
-}
 
 function ChatStack() {
   return (
@@ -59,7 +51,11 @@ function MainTabs() {
           return <Icon name={iconName} size={size} color={color} />;
         },
         headerShown: false,
-        tabBarStyle: { backgroundColor: theme.background },
+        tabBarStyle: {
+          backgroundColor: theme.background,
+          height: 50,
+          paddingBottom: 5,
+        },
         tabBarActiveTintColor: theme.accent,
         tabBarInactiveTintColor: theme.dim,
       })}
@@ -103,9 +99,10 @@ const AppContent = () => {
           component={MainTabs}
           options={{
             headerTitle: () => <HeaderTitle />,
-            headerRight: () => <DisconnectButton />,
+            headerRight: () => <HeaderControls />,
+            headerTitleAlign: 'left',
             headerLeft: () => null,
-            headerStyle: { backgroundColor: theme.background },
+            headerStyle: { backgroundColor: theme.background, height: 70 },
           }}
         />
       </Stack.Navigator>
