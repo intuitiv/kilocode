@@ -1,21 +1,11 @@
 import { getServerUrl } from '../config';
 import EventSource from 'react-native-event-source';
 
-const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
-  // EventSource requires the URL to include query params for POST data,
-  // which is not standard but how this library and many servers handle it.
-  // A better approach would be a proper SSE library that supports POST bodies.
-  // Given the constraints, we will assume the server can handle this or we will adjust the server.
-  // For now, let's just use the library as intended.
-  // The library does not support POST body, so we will send the data as query params.
-  // This is a limitation of the library.
+export const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
   const fullUrl = new URL(url);
   if (body.taskId) fullUrl.searchParams.append('taskId', body.taskId);
   if (body.message) fullUrl.searchParams.append('message', body.message);
 
-  // The library also does not allow custom headers for the initial POST.
-  // We are switching to GET request as is standard for EventSource.
-  // The server will need to be adapted to handle GET requests for these endpoints.
   const eventSource = new EventSource(fullUrl.toString());
 
   eventSource.addEventListener('open', () => {
@@ -23,15 +13,14 @@ const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
   });
 
   eventSource.addEventListener('message', (event) => {
-    if (event.type === 'message') {
-      onMessage(JSON.parse(event.data));
+    const message = JSON.parse(event.data);
+    if (message.type === 'stream_end') {
+      console.log('SSE stream finished.');
+      if (onComplete) onComplete();
+      eventSource.close();
+    } else {
+      onMessage(message);
     }
-  });
-
-  eventSource.addEventListener('done', () => {
-    console.log('SSE stream finished.');
-    if (onComplete) onComplete();
-    eventSource.close();
   });
 
   eventSource.addEventListener('taskId', (event) => {
@@ -42,19 +31,14 @@ const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
   });
 
   eventSource.addEventListener('error', (error) => {
-    // The 'error' event is fired when the connection is closed by the server,
-    // or for actual network errors. We don't want to call onError for a graceful close.
     if (error.type === 'error') {
       console.error('SSE error:', error);
       if (onError) onError(error);
     }
+    // Always close on error to prevent reconnect loops
     eventSource.close();
   });
 
-  // Note: There is no explicit 'onComplete' for SSE other than the server closing the connection,
-  // which triggers an error. We use the error handler to signify completion.
-
-  // Return a function to cancel the stream
   return () => {
     eventSource.close();
     if (onComplete) onComplete();

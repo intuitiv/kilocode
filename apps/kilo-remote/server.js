@@ -229,10 +229,7 @@ app.get('/tasks/:taskId', (req, res) => {
   }
 });
 
-app.get('/new-task', (req, res) => {
-  const taskId = crypto.randomUUID();
-  console.log(`GET /new-task, message: "${req.query.message}". Responding with taskId: ${taskId}`);
-
+const handleStreamRequest = (req, res, message, taskId) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -240,10 +237,12 @@ app.get('/new-task', (req, res) => {
     'Access-Control-Allow-Origin': '*',
   });
 
-  // Send taskId event first
-  res.write(`id: ${Date.now()}\n`);
-  res.write(`event: taskId\n`);
-  res.write(`data: ${JSON.stringify({ taskId })}\n\n`);
+  if (taskId) {
+    // Send taskId event first for new tasks
+    res.write(`id: ${Date.now()}\n`);
+    res.write(`event: taskId\n`);
+    res.write(`data: ${JSON.stringify({ taskId })}\n\n`);
+  }
 
   // Stream sample messages
   const sendEvent = (index) => {
@@ -252,8 +251,8 @@ app.get('/new-task', (req, res) => {
       res.write(`data: ${JSON.stringify(message)}\n\n`);
       setTimeout(() => sendEvent(index + 1), 250);
     } else {
-      res.write('event: done\n');
-      res.write('data: {}\n\n');
+      // Send end-of-stream for web clients
+      res.write('data: {"type": "stream_end"}\n\n');
       res.end();
     }
   };
@@ -263,37 +262,19 @@ app.get('/new-task', (req, res) => {
   req.on('close', () => {
     // Stop sending events if the client disconnects
   });
+};
+
+app.get('/new-task', (req, res) => {
+  const taskId = crypto.randomUUID();
+  const { message } = req.query;
+  console.log(`GET /new-task, message: "${message}". Responding with taskId: ${taskId}`);
+  handleStreamRequest(req, res, message, taskId);
 });
 
 app.get('/send-followup', (req, res) => {
   const { taskId, message } = req.query;
   console.log(`GET /send-followup for task ${taskId}: "${message}"`);
-
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-  });
-
-  // Stream sample messages
-  const sendEvent = (index) => {
-    if (index < sampleMessages.length) {
-      const message = sampleMessages[index];
-      res.write(`data: ${JSON.stringify(message)}\n\n`);
-      setTimeout(() => sendEvent(index + 1), 250);
-    } else {
-      res.write('event: done\n');
-      res.write('data: {}\n\n');
-      res.end();
-    }
-  };
-
-  sendEvent(0);
-
-  req.on('close', () => {
-    // Stop sending events if the client disconnects
-  });
+  handleStreamRequest(req, res, message, null);
 });
 
 app.get('/current-mode/:taskId', (req, res) => {
