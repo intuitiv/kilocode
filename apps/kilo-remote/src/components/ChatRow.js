@@ -78,7 +78,7 @@ const ChatRow = ({ item, onSuggestionPress }) => {
   };
 
   return (
-    <View key={item.ts} className={`p-2 my-1 mx-2 rounded-lg ${item.sender === 'user' ? 'bg-primary self-end' : 'bg-gray-200 self-start'}`} style={{ marginBottom: 4 }}>
+    <View key={item.ts} style={{ alignSelf: item.sender === 'user' ? 'flex-end' : 'flex-start' }}>
       {renderContent()}
     </View>
   );

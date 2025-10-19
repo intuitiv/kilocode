@@ -14,7 +14,7 @@ const HeaderTitle = () => {
   const url = getServerUrl();
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 0 }}>
+    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
       <Text
         style= {styles.title}
       >

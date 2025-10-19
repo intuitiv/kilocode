@@ -6,8 +6,8 @@ const VerboseToggle = () => {
   const { isVerbose, toggleVerbose, theme } = useTheme();
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text style={{ color: theme.text, marginRight: 8 }}>Verbose</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'right' }}>
+      {/* <Text style={{ color: theme.text, marginRight: 8 }}>Verbose</Text> */}
       <Switch
         trackColor={{ false: theme.dim, true: theme.accent }}
         thumbColor={isVerbose ? theme.surface : theme.background}

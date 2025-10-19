@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Picker } from '@react-native-picker/picker';
+import RNPickerSelect from 'react-native-picker-select';
 import { useTheme } from '../hooks/useTheme';
 import { getChatInputStyles } from '../styles';
 
@@ -26,7 +26,7 @@ const ChatInput = ({
   onModeChange,
 }) => {
   const { theme } = useTheme();
-  const styles = getChatInputStyles(theme);
+  const { pickerSelectStyles, ...styles } = getChatInputStyles(theme);
 
   return (
     <View style={styles.container}>
@@ -47,17 +47,17 @@ const ChatInput = ({
 
       <View style={styles.bottomBar}>
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={mode}
-            style={styles.picker}
-            itemStyle={styles.itemStyle}
-            dropdownIconColor={theme.primaryText}
-            onValueChange={(itemValue) => onModeChange(itemValue)}
-          >
-            {modes.map((m) => (
-              <Picker.Item key={m.value} label={m.label} value={m.value} />
-            ))}
-          </Picker>
+          <RNPickerSelect
+            onValueChange={(value) => onModeChange(value)}
+            items={modes}
+            style={pickerSelectStyles}
+            value={mode}
+            useNativeAndroidPickerStyle={false}
+            placeholder={{}}
+            Icon={() => {
+              return <Icon name="chevron-down" size={12} color={theme.dim} />;
+            }}
+          />
         </View>
 
         {isStreaming ? (

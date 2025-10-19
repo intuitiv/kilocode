@@ -2,7 +2,34 @@
 import { StyleSheet } from 'react-native';
 
 export const getChatInputStyles = (theme) => {
-  return StyleSheet.create({
+  const pickerSelectStyles = {
+    inputIOS: {
+      fontSize: 14,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 4,
+      color: theme.accent,
+      paddingRight: 30, // to ensure the text is never behind the icon
+    },
+    inputAndroid: {
+      fontSize: 14,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 4,
+      color: theme.accent,
+      paddingRight: 30,
+    },
+    iconContainer: {
+      top: 10,
+      right: 12,
+    },
+  };
+
+  const styles = StyleSheet.create({
     container: {
       padding: 6, // compact
       borderWidth: 1,
@@ -19,6 +46,7 @@ export const getChatInputStyles = (theme) => {
       borderWidth: 0,
       padding: 8, // compact
       minHeight: 48, // smaller
+      maxHeight: 120,
       textAlignVertical: 'top',
       color: theme.primaryText,
       fontFamily: theme.fonts.main,
@@ -32,18 +60,8 @@ export const getChatInputStyles = (theme) => {
       marginTop: 6,
     },
     pickerContainer: {
-      width: 120,
-    },
-    picker: {
-      height: 20,
-      width: '100%',
-      color: theme.primaryText,
-      backgroundColor: theme.background,
-      borderRadius: 8,
-    },
-    itemStyle: {
-      fontSize: 16,
-      color: theme.primaryText,
+      flex: 1,
+      marginRight: 8,
     },
     icon: {
       paddingRight: 6,
@@ -63,6 +81,8 @@ export const getChatInputStyles = (theme) => {
       fontSize: 16,
     },
   });
+
+  return { ...styles, pickerSelectStyles };
 };
 
 export const getHeaderTitleStyles = (theme) => {
@@ -459,7 +479,7 @@ export const getPinnedMessageStyles = (theme) => {
     },
     icon: {
       marginRight: 8,
-      color: theme.highlight,
+      color: theme.dim,
       fontSize: 14,
     },
     text: {

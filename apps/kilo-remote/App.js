@@ -27,7 +27,7 @@ function DisconnectButton() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   return (
-    <TouchableOpacity onPress={() => navigation.navigate('Home')} style={{ marginRight: 10 }}>
+    <TouchableOpacity onPress={() => navigation.navigate('Home')} style={{ marginRight: 15 }}>
       <Icon name="power-off" size={24} color={theme.accent} />
     </TouchableOpacity>
   );
