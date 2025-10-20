@@ -226,6 +226,28 @@ curl http://127.0.0.1:8080/tasks/YOUR_TASK_ID
 
 A `Task` object, including the `historyItem` and `apiConversationHistory`.
 
+### `GET /tasks/{taskId}/condensed`
+
+Returns a condensed summary of a single task.
+
+**Query Parameters:**
+
+- `workspace` (required): The workspace the task belongs to.
+
+**cURL Command:**
+
+```bash
+curl "http://127.0.0.1:8080/tasks/YOUR_TASK_ID/condensed?workspace=YOUR_WORKSPACE"
+```
+
+**Response:**
+
+```json
+{
+	"summary": "A condensed summary of the task."
+}
+```
+
 ### `GET /modes`
 
 Returns a list of available modes.
@@ -283,3 +305,4 @@ curl http://127.0.0.1:8080/health
 	"status": "ok",
 	"workspacePath": "/path/to/your/workspace"
 }
+```

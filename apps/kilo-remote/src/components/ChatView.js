@@ -1,199 +1,178 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import PinnedMessage from './PinnedMessage';
-import ChatInput from './ChatInput';
-import ChatRow from './ChatRow';
-import { useTheme } from '../hooks/useTheme';
-import { getChatViewStyles, modeStyles } from '../styles';
-import MatrixBackground from './MatrixBackground';
-import ArchitectureBackground from './ArchitectureBackground';
-import DefaultBackground from './DefaultBackground';
-import { config } from '../config';
-import {
-  startNewTask,
-  sendFollowup,
-  cancelTask,
-  getTaskHistory,
-  setMode as setApiMode,
-} from '../services/api';
+import React, { useState, useEffect, useRef, useCallback } from "react"
+import { View, Text, FlatList, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
+import PinnedMessage from "./PinnedMessage"
+import ChatInput from "./ChatInput"
+import ChatRow from "./ChatRow"
+import { useTheme } from "../hooks/useTheme"
+import { getChatViewStyles } from "../styles/components"
+import { getModeStyles } from "../styles/theme"
+import { config } from "../config"
+import MatrixBackground from "./MatrixBackground"
+import ArchitectureBackground from "./ArchitectureBackground"
+import DefaultBackground from "./DefaultBackground"
+import { startNewTask, sendFollowup, cancelTask, getTaskHistory, setMode as setApiMode } from "../services/api"
 
 const ChatView = ({ route }) => {
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [currentTaskId, setCurrentTaskId] = useState(null);
-  const [pinnedMessage, setPinnedMessage] = useState('');
-  const [mode, setMode] = useState('architect');
-  const { theme, setExpandedMessageId } = useTheme();
-  const styles = getChatViewStyles(theme);
-  const flatListRef = useRef(null);
-  const inputRef = useRef(null);
+	const [messages, setMessages] = useState([])
+	const [inputValue, setInputValue] = useState("")
+	const [isStreaming, setIsStreaming] = useState(false)
+	const [currentTaskId, setCurrentTaskId] = useState(null)
+	const [pinnedMessage, setPinnedMessage] = useState("")
+	const [mode, setMode] = useState("architect")
+	const { theme, setExpandedMessageId } = useTheme()
+	const styles = getChatViewStyles(theme)
+	const flatListRef = useRef(null)
+	const inputRef = useRef(null)
 
-  const activeModeStyle = modeStyles[mode] || modeStyles.architect;
+	const modeStyles = getModeStyles(theme)
+	const activeModeStyle = modeStyles[mode] || modeStyles.architect
 
-  useFocusEffect(
-    useCallback(() => {
-      const { task } = route.params || {};
-      console.log('ChatView focused with task:', task);
+	useFocusEffect(
+		useCallback(() => {
+			const { task } = route.params || {}
+			console.log("ChatView focused with task:", task)
 
-      if (task) {
-        console.log('Loading history for taskId:', task.id);
-        setCurrentTaskId(task.id);
-        setPinnedMessage(task.task);
-        setMode(task.mode);
-        getTaskHistory(task.id).then((data) => {
-          if (data) {
-            console.log('History data received:', data);
-            setMessages(data);
-          }
-        });
-      } else {
-        console.log('New chat session.');
-        setMessages([]);
-        setCurrentTaskId(null);
-        setPinnedMessage('');
-        setMode('architect');
-      }
-    }, [route.params?.task])
-  );
+			if (task) {
+				console.log("Loading history for taskId:", task.id)
+				setCurrentTaskId(task.id)
+				setPinnedMessage(task.task)
+				setMode(task.mode)
+				getTaskHistory(task.id).then((data) => {
+					if (data) {
+						console.log("History data received:", data)
+						setMessages(data)
+					}
+				})
+			} else {
+				console.log("New chat session.")
+				setMessages([])
+				setCurrentTaskId(null)
+				setPinnedMessage("")
+				setMode("architect")
+			}
+		}, [route.params?.task]),
+	)
 
-  const onMessage = (newMessage) => {
-    if (newMessage.type === 'ask' && newMessage.ask === 'tool') {
-      try {
-        const tool = JSON.parse(newMessage.text);
-        if (tool.tool === 'switchMode' && tool.mode) {
-          setMode(tool.mode);
-        }
-      } catch (e) {
-        console.error('Error parsing tool message:', e);
-      }
-    }
+	const onMessage = useCallback((newMessage) => {
+		if (newMessage.type === "ask" && newMessage.ask === "tool") {
+			try {
+				const tool = JSON.parse(newMessage.text)
+				if (tool.tool === "switchMode" && tool.mode) {
+					setMode(tool.mode)
+				}
+			} catch (e) {
+				console.error("Error parsing tool message:", e)
+			}
+			return // Do not render tool messages
+		}
 
-    if (newMessage.partial) {
-      setMessages((prevMessages) => {
-        const newMessages = [...prevMessages];
-        const lastMessage = newMessages[newMessages.length - 1];
-        if (lastMessage && lastMessage.sender !== 'user' && lastMessage.ts === newMessage.ts) {
-          newMessages[newMessages.length - 1] = newMessage;
-        } else {
-          newMessages.push(newMessage);
-        }
-        return newMessages;
-      });
-    } else {
-      setMessages((prevMessages) => {
-        const newMessages = [...prevMessages];
-        const lastMessage = newMessages[newMessages.length - 1];
-        if (lastMessage && lastMessage.sender !== 'user' && lastMessage.ts === newMessage.ts) {
-          newMessages[newMessages.length - 1] = newMessage;
-        } else {
-          newMessages.push(newMessage);
-        }
-        return newMessages;
-      });
-    }
-  };
+		setMessages((prevMessages) => {
+			const newMessages = [...prevMessages]
+			const lastMessage = newMessages[newMessages.length - 1]
 
-  const onError = (error) => {
-    console.error('Streaming error:', error);
-    setIsStreaming(false);
-  };
+			if (lastMessage && lastMessage.sender !== "user" && lastMessage.ts === newMessage.ts) {
+				// Update last message if it's a partial from the same stream
+				newMessages[newMessages.length - 1] = { ...lastMessage, ...newMessage }
+			} else {
+				// Add new message
+				newMessages.push(newMessage)
+			}
+			return newMessages
+		})
+	}, [])
 
-  const onComplete = () => {
-    setIsStreaming(false);
-  };
+	const onError = (error) => {
+		console.error("Streaming error:", error)
+		setIsStreaming(false)
+	}
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
+	const onComplete = () => {
+		setIsStreaming(false)
+	}
 
-    await setApiMode(mode);
+	const handleSend = async () => {
+		if (!inputValue.trim()) return
 
-    const userMessage = {
-      ts: Date.now(),
-      type: 'say',
-      say: 'text',
-      text: inputValue,
-      sender: 'user',
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue('');
-    setIsStreaming(true);
+		await setApiMode(mode)
 
-    setPinnedMessage(inputValue);
+		const userMessage = {
+			ts: Date.now(),
+			type: "say",
+			say: "text",
+			text: inputValue,
+			sender: "user",
+		}
+		setMessages((prev) => [...prev, userMessage])
+		setInputValue("")
+		setIsStreaming(true)
 
-    const onTaskId = (taskId) => {
-      console.log('onTaskId callback received taskId:', taskId);
-      setCurrentTaskId(taskId);
-    };
+		setPinnedMessage(inputValue)
 
-    if (currentTaskId) {
-      sendFollowup(currentTaskId, inputValue, onMessage, onError, onComplete);
-    } else {
-      startNewTask(inputValue, onMessage, onError, onComplete, onTaskId);
-    }
-  };
+		const onTaskId = (taskId) => {
+			console.log("onTaskId callback received taskId:", taskId)
+			setCurrentTaskId(taskId)
+		}
 
-  const handleCancel = () => {
-    cancelTask(currentTaskId);
-    setIsStreaming(false);
-  };
+		if (currentTaskId) {
+			sendFollowup(currentTaskId, inputValue, onMessage, onError, onComplete)
+		} else {
+			startNewTask(inputValue, onMessage, onError, onComplete, onTaskId)
+		}
+	}
 
-  const backgroundMap = {
-    code: <MatrixBackground />,
-    architect: <ArchitectureBackground />,
-  };
+	const handleCancel = () => {
+		cancelTask(currentTaskId)
+		setIsStreaming(false)
+	}
 
-  const BackgroundComponent = backgroundMap[mode] || <DefaultBackground />;
+	const backgroundMap = {
+		code: <MatrixBackground />,
+		architect: <ArchitectureBackground />,
+	}
 
-  return (
-    <View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
-      {BackgroundComponent}
-      <PinnedMessage message={pinnedMessage} />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item, index) => `${item.ts}-${index}`}
-          renderItem={({ item }) => (
-            <ChatRow
-              item={item}
-              onSuggestionPress={(suggestion) => {
-                setInputValue(suggestion);
-              }}
-            />
-          )}
-          onScrollBeginDrag={() => setExpandedMessageId(null)}
-          contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
-          showsVerticalScrollIndicator={true}
-        />
-      </KeyboardAvoidingView>
+	const BackgroundComponent = backgroundMap[mode] || <DefaultBackground />
 
-      <View style={styles.inputContainer}>
-        <ChatInput
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-          isStreaming={isStreaming}
-          handleSend={handleSend}
-          handleCancel={handleCancel}
-          mode={mode}
-          onModeChange={setMode}
-          inputRef={inputRef}
-        />
-      </View>
-    </View>
-  );
-};
+	return (
+		<View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
+			{BackgroundComponent}
+			<PinnedMessage message={pinnedMessage} />
+			<KeyboardAvoidingView
+				style={{ flex: 1 }}
+				behavior={Platform.OS === "ios" ? "padding" : undefined}
+				keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}>
+				<FlatList
+					ref={flatListRef}
+					data={messages}
+					keyExtractor={(item, index) => `${item.ts}-${index}`}
+					renderItem={({ item }) => (
+						<ChatRow
+							item={item}
+							onSuggestionPress={(suggestion) => {
+								setInputValue(suggestion)
+							}}
+						/>
+					)}
+					onScrollBeginDrag={() => setExpandedMessageId(null)}
+					contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
+					showsVerticalScrollIndicator={true}
+				/>
+			</KeyboardAvoidingView>
 
-export default ChatView;
+			<View style={styles.inputContainer}>
+				<ChatInput
+					inputValue={inputValue}
+					setInputValue={setInputValue}
+					isStreaming={isStreaming}
+					handleSend={handleSend}
+					handleCancel={handleCancel}
+					mode={mode}
+					onModeChange={setMode}
+					inputRef={inputRef}
+				/>
+			</View>
+		</View>
+	)
+}
+
+export default ChatView
