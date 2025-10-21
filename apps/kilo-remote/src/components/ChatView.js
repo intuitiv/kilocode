@@ -13,6 +13,11 @@ import ArchitectureBackground from "./ArchitectureBackground"
 import DefaultBackground from "./DefaultBackground"
 import { startNewTask, sendFollowup, cancelTask, getTaskHistory, setMode as setApiMode } from "../services/api"
 
+const backgroundMap = {
+	code: <MatrixBackground />,
+	architect: <ArchitectureBackground />,
+};
+
 const ChatView = ({ route }) => {
 	const [messages, setMessages] = useState([])
 	const [inputValue, setInputValue] = useState("")
@@ -125,12 +130,18 @@ const ChatView = ({ route }) => {
 		setIsStreaming(false)
 	}
 
-	const backgroundMap = {
-		code: <MatrixBackground />,
-		architect: <ArchitectureBackground />,
-	}
-
 	const BackgroundComponent = backgroundMap[mode] || <DefaultBackground />
+
+	const onSuggestionPress = useCallback((suggestion) => {
+		setInputValue(suggestion)
+	}, []);
+
+	const renderItem = useCallback(({ item }) => (
+		<ChatRow
+			item={item}
+			onSuggestionPress={onSuggestionPress}
+		/>
+	), [onSuggestionPress]);
 
 	return (
 		<View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
@@ -143,15 +154,8 @@ const ChatView = ({ route }) => {
 				<FlatList
 					ref={flatListRef}
 					data={messages}
-					keyExtractor={(item, index) => `${item.ts}-${index}`}
-					renderItem={({ item }) => (
-						<ChatRow
-							item={item}
-							onSuggestionPress={(suggestion) => {
-								setInputValue(suggestion)
-							}}
-						/>
-					)}
+					keyExtractor={(item) => item.ts.toString()}
+					renderItem={renderItem}
 					onScrollBeginDrag={() => setExpandedMessageId(null)}
 					contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
 					showsVerticalScrollIndicator={true}

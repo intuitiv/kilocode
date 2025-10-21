@@ -74,6 +74,7 @@ export const darkTheme = {
     title: 'Orbitron-Regular',
     architect: 'IBMPlexSerif-Regular',
     medium: 'System',
+    monospace: 'JetBrainsMono-Regular',
   },
 };
 
@@ -148,6 +149,7 @@ export const lightTheme = {
     title: 'Orbitron-Regular',
     architect: 'IBMPlexSerif-Regular',
     medium: 'System',
+    monospace: 'JetBrainsMono-Regular',
   },
 };
 

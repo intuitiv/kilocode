@@ -84,4 +84,6 @@ const ChatRow = ({ item, onSuggestionPress }) => {
   );
 };
 
-export default ChatRow;
+const MemoizedChatRow = React.memo(ChatRow);
+MemoizedChatRow.whyDidYouRender = true;
+export default MemoizedChatRow;
