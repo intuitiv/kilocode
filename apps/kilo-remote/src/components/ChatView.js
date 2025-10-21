@@ -64,7 +64,6 @@ const ChatView = ({ route }) => {
 			} catch (e) {
 				console.error("Error parsing tool message:", e)
 			}
-			return // Do not render tool messages
 		}
 
 		setMessages((prevMessages) => {

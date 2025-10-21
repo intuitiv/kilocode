@@ -15,6 +15,7 @@ import SwitchModeMessage from './messages/SwitchModeMessage';
 
 const ChatRow = ({ item, onSuggestionPress }) => {
   const renderContent = () => {
+  console.log(item.text.substring(0, 30));
    switch (item.type) {
       case 'say':
         switch (item.say) {
@@ -55,7 +56,6 @@ const ChatRow = ({ item, onSuggestionPress }) => {
           case 'followup':
             return <KiloQuestionMessage item={item} onSelect={onSuggestionPress} />;
           case 'tool':
-            console.log(item.text)
             const tool = JSON.parse(item.text.replace(/\n/g, "\\n"));
             if (tool.tool === 'updateTodoList') {
               return <TodoListMessage item={item} />;
