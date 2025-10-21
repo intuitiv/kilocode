@@ -154,7 +154,7 @@ const ChatView = ({ route }) => {
 				<FlatList
 					ref={flatListRef}
 					data={messages}
-					keyExtractor={(item) => item.ts.toString()}
+					keyExtractor={(item, index) => `${item.ts}-${index}`}
 					renderItem={renderItem}
 					onScrollBeginDrag={() => setExpandedMessageId(null)}
 					contentContainerStyle={{ padding: 10, paddingBottom: 150 }}

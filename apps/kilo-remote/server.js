@@ -190,6 +190,25 @@ const sampleMessages = [
 	//     "text": "{\"tool\":\"listFilesTopLevel\",\"path\":\"apps/kilo-remote/src/styles\",\"isOutsideWorkspace\":false,\"content\":\"ambient.js\n animations.js\nmessages.js\nmodes.js\ntext-treatments.js\ntheme.js\ntransitions.js\ntypography.js\"}",
 	//     "isProtected": false
 	// }
+,
+	{
+		ts: 1761017879437,
+		type: "ask",
+		ask: "completion_result",
+		text: ""
+	},
+	{
+		ts: 1761025633515,
+		type: "ask",
+		ask: "resume_completed_task"
+	},
+	{
+		ts: 1761025907958,
+		type: "say",
+		say: "user_feedback",
+		text: "secondary text is kinda very greyish. And I am using secondary for all the main text on the screen.\nIf it matches with primaryText, may be change it to somethign different but. Make secondary text brighter",
+		images: []
+	}
 ]
 
 app.get("/health", (req, res) => {

@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient"
 import { useTheme } from "../../hooks/useTheme"
 import { getMessageCardStyles } from "../../styles"
 
-const MessageCard = ({ headerIcon, headerText, children, onHeaderPress, isError }) => {
+const MessageCard = ({ headerIcon, headerText, children, onHeaderPress, isError, isUserFeedback }) => {
 	const { theme } = useTheme()
 	const styles = getMessageCardStyles(theme)
 
@@ -26,7 +26,7 @@ const MessageCard = ({ headerIcon, headerText, children, onHeaderPress, isError 
 			start={{ x: 0, y: 0 }}
 			end={{ x: 1, y: 1 }}
 			style={styles.gradientBorder}>
-			<View style={styles.card}>
+			<View style={[styles.card, isUserFeedback && { backgroundColor: theme.dim }]}>
 				{headerText &&
 					(onHeaderPress ? (
 						<TouchableOpacity onPress={onHeaderPress} activeOpacity={0.7}>

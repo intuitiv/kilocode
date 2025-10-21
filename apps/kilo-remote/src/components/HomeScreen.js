@@ -28,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Connect to Kilo Bridge</Text>
+      <Text style={styles.title}>Welcome to Kilo canvas</Text>
       <TextInput
         style={styles.input}
         value={url}

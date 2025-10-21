@@ -6,7 +6,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { getKiloSaidMessageStyles } from '../../styles';
 import MessageCard from './MessageCard';
 
-const KiloSaidMessage = ({ item }) => {
+const KiloSaidMessage = ({ item, isUserFeedback }) => {
   const { theme, isVerbose, expandedMessageId, setExpandedMessageId } = useTheme();
   const isExpanded = expandedMessageId === item.ts;
   const styles = getKiloSaidMessageStyles(theme);
@@ -20,7 +20,7 @@ const KiloSaidMessage = ({ item }) => {
       <TouchableWithoutFeedback onPress={() => { /* Stop propagation */ }}>
         <MessageCard>
           <TouchableOpacity onPress={handlePress}>
-            <View style={!isExpanded && { maxHeight: 65, overflow: 'hidden' }}>
+            <View style={[!isExpanded && { maxHeight: 65, overflow: 'hidden' }, isUserFeedback && { backgroundColor: theme.dim }]}>
               <Markdown
                 style={{
                   body: styles.body,
@@ -41,6 +41,7 @@ const KiloSaidMessage = ({ item }) => {
     <MessageCard
       headerIcon={<Feather name="message-circle" size={18} style={styles.icon} />}
       headerText="Kilo said:"
+      isUserFeedback={isUserFeedback}
     >
       <Markdown
         style={{

@@ -189,7 +189,7 @@ export const getCommandMessageStyles = (theme) => {
 		commandText: {
 			fontFamily: "monospace",
 			fontSize: 13,
-			color: theme.primaryText,
+			color: theme.secondaryText,
 			lineHeight: 18,
 		},
 		footer: {
@@ -239,7 +239,7 @@ export const getKiloQuestionMessageStyles = (theme) => {
 			marginLeft: 2,
 		},
 		markdownBody: {
-			color: theme.primaryText,
+			color: theme.secondaryText,
 			fontSize: 13,
 			lineHeight: 18,
 		},
@@ -284,7 +284,7 @@ export const getReadFileMessageStyles = (theme) => {
 			fontSize: 13,
 		},
 		pathText: {
-			color: theme.pathText,
+			color: theme.primaryText,
 			fontSize: 12,
 		},
 		approveButton: {
@@ -339,7 +339,7 @@ export const getCompletionResultMessageStyles = (theme) => {
 			fontSize: 14,
 		},
 		markdownBody: {
-			color: theme.primaryText,
+			color: theme.secondaryText,
 			fontSize: 13,
 			lineHeight: 18,
 		},
@@ -350,7 +350,7 @@ export const getCompletionResultMessageStyles = (theme) => {
 			color: theme.secondaryText,
 		},
 		markdownListItem: {
-			color: theme.primaryText,
+			color: theme.secondaryText,
 			fontSize: 13,
 		},
 		code_inline: {
@@ -694,7 +694,7 @@ export const getFileOperationMessageStyles = (theme) => {
 			marginLeft: 12,
 		},
 		pathText: {
-			color: theme.pathText,
+			color: theme.secondaryText,
 			fontSize: 12,
 		},
 		markdownPath: {

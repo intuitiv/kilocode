@@ -2,70 +2,68 @@
 
 export const darkTheme = {
   // ---- Core Background ----
-  background: '#0B0F14', // deep neutral navy base
-  backgroundGradient: ['#0B0F14', '#0F1720', '#141E28'], // subtle dark gradient
-  cardBackground: '#121821', // elevated card surface
-  codeBlocks: '#161E28', // slightly brighter for readability
+  background: '#0A0E14',
+  backgroundGradient: ['#0A0E14', '#0E141E', '#121A28'],
+  cardBackground: '#10161F',
+  codeBlocks: '#141C28',
 
   // ---- Primary Palette ----
-  primary: '#00D4A3', // clean teal for key highlights
-  secondary: '#009EFF', // accent blue for links, focus
-  accent: '#FF4FA3', // pink-magenta for buttons and actions
-  highlight: '#00C7FF', // cyan edge-glow for active states
-  dim: '#2E3A46', // muted tone for dividers, meta
+  primary: '#00E0A3',
+  secondary: '#33CFFF',
+  accent: '#E000A3',
+  highlight: '#00E0A3',
+  dim: '#2A3440',
 
   // ---- Semantic Colors ----
-  success: '#00E676', // green-teal success
-  warning: '#FFB74D', // warm amber
-  error: '#FF4D4D', // bright red
+  success: '#00E0A3',
+  warning: '#E0A300',
+  error: '#E04040',
 
   // ---- Text Colors ----
-  primaryText: '#E8F6F0', // readable bright text
-  secondaryText: '#B5C8C2', // soft secondary
-  subduedText: '#6E8280', // metadata / hints
+  primaryText: '#FFFFFF',
+  secondaryText: '#D0D0D0',
+  subduedText: '#606060',
 
   // ---- Borders & Shadows ----
-  border: 'rgba(0, 212, 163, 0.15)', // teal border glow
-  borderActive: 'rgba(0, 212, 255, 0.35)', // active focus glow
-  shadow: 'rgba(0, 180, 200, 0.08)', // subtle ambient depth
+  border: 'rgba(0, 224, 163, 0.15)',
+  borderActive: 'rgba(0, 163, 224, 0.35)',
+  shadow: 'rgba(0, 163, 224, 0.08)',
 
   // ---- Component-Specific ----
-  commandHighlight: '#F0A45B', // inline code, commands
-  costText: '#00C7FF', // numeric or computed values
+  commandHighlight: '#E0A300',
+  costText: '#00A3E0',
   buttonText: '#FFFFFF',
-  pathText: '#A8F0E0',
-  backgroundOverlay: 'rgba(12, 20, 25, 0.4)',
-  pulseAnimation: 'rgba(0, 212, 163, 0.1)',
-  bubbleColor: 'rgba(0, 160, 255, 0.35)',
-  codeFlowColor: 'rgba(0, 255, 180, 0.35)',
-  matrixColor: 'rgba(0, 255, 140, 0.7)',
+  pathText: '#00E0A3',
+  backgroundOverlay: 'rgba(10, 14, 20, 0.4)',
+  pulseAnimation: 'rgba(0, 224, 163, 0.1)',
+  bubbleColor: 'rgba(0, 163, 224, 0.35)',
+  codeFlowColor: 'rgba(0, 224, 163, 0.35)',
+  matrixColor: 'rgba(0, 224, 163, 0.7)',
 
   // ---- Gradients & Glow ----
-rainbowGradient: [
-  '#A8FFBF', // soft mint
-  '#6BFF9C', // bright lime-green
-  '#00E6A0', // teal-green
-  '#009E80', // medium jade
-  '#005F4A', // deep emerald
-],
+  rainbowGradient: [
+    '#00E0A3',
+    '#00A3E0',
+    '#E000A3',
+  ],
 
   // ---- Syntax Highlighting ----
   syntax: {
-    comment: '#5C6B75',
-    string: '#9EE6B8',
-    keyword: '#9A7CFF',
-    number: '#FFB26B',
-    className: '#4FC3F7',
-    function: '#67E8F9',
+    comment: '#606060',
+    string: '#00E0A3',
+    keyword: '#00A3E0',
+    number: '#E0A300',
+    className: '#00A3E0',
+    function: '#00E0A3',
   },
 
   // ---- Mode Colors ----
   modes: {
-    architect: '#00C7FF',
-    code: '#00D4A3',
-    debug: '#FF4D4D',
-    task: '#4FC3F7',
-    explain: '#FFB74D',
+    architect: '#00A3E0',
+    code: '#00E0A3',
+    debug: '#E04040',
+    task: '#00A3E0',
+    explain: '#E0A300',
   },
 
   // ---- Typography ----
@@ -80,68 +78,67 @@ rainbowGradient: [
 
 export const lightTheme = {
   // ---- Core Background ----
-  background: '#F7FAFC',
-  backgroundGradient: ['#FFFFFF', '#F1F5F7', '#E8EEEF'],
+  background: '#F5F7FA',
+  backgroundGradient: ['#FFFFFF', '#F5F7FA', '#E8EEEF'],
   cardBackground: '#FFFFFF',
-  codeBlocks: '#F3F6F8',
+  codeBlocks: '#F0F2F5',
 
   // ---- Primary Palette ----
   primary: '#009688',
-  secondary: '#2196F3',
+  secondary: '#007BFF',
   accent: '#E91E63',
-  highlight: '#00BCD4',
-  dim: '#C4D0D3',
+  highlight: '#009688',
+
+  dim: '#D0D5DA',
 
   // ---- Semantic ----
-  success: '#00BFA5',
-  warning: '#FFA726',
-  error: '#E53935',
+  success: '#009688',
+  warning: '#FFC107',
+  error: '#DC3545',
 
   // ---- Text ----
-  primaryText: '#1C2624',
-  secondaryText: '#4F5B58',
-  subduedText: '#80908A',
+  primaryText: '#000000',
+  secondaryText: '#303030',
+  subduedText: '#A0A0A0',
 
   // ---- Border & Shadow ----
-  border: 'rgba(0,0,0,0.08)',
-  borderActive: 'rgba(0,0,0,0.25)',
-  shadow: 'rgba(0,0,0,0.04)',
+  border: 'rgba(0, 0, 0, 0.1)',
+  borderActive: 'rgba(0, 123, 255, 0.25)',
+  shadow: 'rgba(0, 123, 255, 0.05)',
 
   // ---- UI ----
-  commandHighlight: '#E07B39',
-  costText: '#009688',
+  commandHighlight: '#FFC107',
+  costText: '#007BFF',
   buttonText: '#FFFFFF',
   pathText: '#009688',
   backgroundOverlay: 'rgba(255, 255, 255, 0.5)',
-  pulseAnimation: 'rgba(0, 212, 163, 0.05)',
-  bubbleColor: 'rgba(33, 150, 243, 0.3)',
-  codeFlowColor: 'rgba(0, 200, 150, 0.3)',
-  matrixColor: 'rgba(0, 255, 140, 0.6)',
+  pulseAnimation: 'rgba(0, 150, 136, 0.05)',
+  bubbleColor: 'rgba(0, 123, 255, 0.3)',
+  codeFlowColor: 'rgba(0, 150, 136, 0.3)',
+  matrixColor: 'rgba(0, 150, 136, 0.6)',
 
   // ---- Gradient ----
   rainbowGradient: [
-    '#00D4A3',
-    '#00C7FF',
-    '#009EFF',
-    '#745CFF',
-    '#FF4FA3',
+    '#009688',
+    '#007BFF',
+    '#E91E63',
   ],
 
   syntax: {
-    comment: '#7A8F8A',
-    string: '#4CAF50',
-    keyword: '#7E57C2',
-    number: '#F9A825',
-    className: '#039BE5',
-    function: '#26C6DA',
+    comment: '#A0A0A0',
+    string: '#009688',
+    keyword: '#007BFF',
+    number: '#FFC107',
+    className: '#007BFF',
+    function: '#009688',
   },
 
   modes: {
-    architect: '#00C7FF',
-    code: '#00D4A3',
-    debug: '#FF4D4D',
-    task: '#4FC3F7',
-    explain: '#FFB74D',
+    architect: '#007BFF',
+    code: '#009688',
+    debug: '#DC3545',
+    task: '#007BFF',
+    explain: '#FFC107',
   },
 
   fonts: {

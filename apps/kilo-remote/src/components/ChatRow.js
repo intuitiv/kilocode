@@ -15,7 +15,7 @@ import SwitchModeMessage from './messages/SwitchModeMessage';
 
 const ChatRow = ({ item, onSuggestionPress }) => {
   const renderContent = () => {
-  console.log(item.text.substring(0, 30));
+  console.log(item?.text?.substring(0, 30));
    switch (item.type) {
       case 'say':
         switch (item.say) {
@@ -24,6 +24,8 @@ const ChatRow = ({ item, onSuggestionPress }) => {
           case 'api_req_started':
             return <ApiRequestMessage item={item} />;
           case 'user_feedback':
+            return <KiloSaidMessage item={item} isUserFeedback={true} />;
+          case 'command_output':
             const codeBlockRegex = /```(\w+)\n([\s\S]*?)```/g;
             const parts = [];
             let lastIndex = 0;
@@ -42,8 +44,6 @@ const ChatRow = ({ item, onSuggestionPress }) => {
             }
 
             return parts;
-          case 'command_output':
-            return <KiloSaidMessage item={item} />;
           case 'completion_result':
             return <CompletionResultMessage item={item} />;
           default:
@@ -55,6 +55,13 @@ const ChatRow = ({ item, onSuggestionPress }) => {
         switch (item.ask) {
           case 'followup':
             return <KiloQuestionMessage item={item} onSelect={onSuggestionPress} />;
+          case 'completion_result':
+            if (item.text) {
+              return <CompletionResultMessage item={item} />;
+            }
+            return null;
+          case 'resume_completed_task':
+            return null;
           case 'tool':
             const tool = JSON.parse(item.text.replace(/\n/g, "\\n"));
             if (tool.tool === 'updateTodoList') {
@@ -78,12 +85,10 @@ const ChatRow = ({ item, onSuggestionPress }) => {
   };
 
   return (
-    <View key={item.ts} style={{ marginVertical: 2, backgroundColor: item.sender === 'user' ? '#0c1d3a' : 'transparent' }}>
+    <View key={item.ts} style={{ marginVertical: 2 }}>
       {renderContent()}
     </View>
   );
 };
 
-const MemoizedChatRow = React.memo(ChatRow);
-MemoizedChatRow.whyDidYouRender = true;
-export default MemoizedChatRow;
+export default React.memo(ChatRow);
