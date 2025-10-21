@@ -7,13 +7,13 @@ import { getCompletionResultMessageStyles } from '../../styles';
 import MessageCard from './MessageCard';
 
 const CompletionResultMessage = ({ item }) => {
-  const { theme } = useTheme();
+  const { theme, isVerbose } = useTheme();
   const styles = getCompletionResultMessageStyles(theme);
 
   return (
     <MessageCard
-      headerIcon={<Icon name="check-circle" size={20} style={styles.icon} />}
-      headerText="Task Complete!"
+      headerIcon={isVerbose && <Icon name="check-circle" size={20} style={styles.icon} />}
+      headerText={isVerbose && "Task Complete!"}
     >
       <Markdown
         style={{

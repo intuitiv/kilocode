@@ -463,11 +463,11 @@ export const getPinnedMessageStyles = (theme) => {
 		container: {
 			flexDirection: "row",
 			alignItems: "center",
-			padding: 12,
+			padding: 8,
 			backgroundColor: theme.cardBackground,
 			borderBottomWidth: 1,
 			borderBottomColor: theme.border,
-			marginTop: 10,
+			marginTop: 8,
 		},
 		icon: {
 			marginRight: 8,
@@ -475,7 +475,7 @@ export const getPinnedMessageStyles = (theme) => {
 			fontSize: 14,
 		},
 		text: {
-			fontSize: 18,
+			fontSize: 16,
 			fontWeight: "700",
 			color: theme.primaryText,
 		},

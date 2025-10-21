@@ -41,13 +41,13 @@ export const darkTheme = {
   matrixColor: 'rgba(0, 255, 140, 0.7)',
 
   // ---- Gradients & Glow ----
-  rainbowGradient: [
-    '#00D4A3',
-    '#00C7FF',
-    '#009EFF',
-    '#745CFF',
-    '#FF4FA3',
-  ],
+rainbowGradient: [
+  '#A8FFBF', // soft mint
+  '#6BFF9C', // bright lime-green
+  '#00E6A0', // teal-green
+  '#009E80', // medium jade
+  '#005F4A', // deep emerald
+],
 
   // ---- Syntax Highlighting ----
   syntax: {
