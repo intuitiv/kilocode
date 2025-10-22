@@ -8,7 +8,7 @@ export const getChatInputStyles = (theme) => {
 			borderWidth: 1,
 			borderColor: theme.border || theme.dim,
 			borderRadius: 8, // slightly reduced
-			margin: 6, // compact
+			margin: 1, // compact
 			backgroundColor: theme.cardBackground || theme.background,
 			shadowColor: theme.shadow,
 			shadowOpacity: 0.08,
@@ -17,6 +17,7 @@ export const getChatInputStyles = (theme) => {
 		},
 		textInput: {
 			borderWidth: 0,
+			outlineStyle: 'none', 
 			padding: 8, // compact
 			minHeight: 48, // smaller
 			maxHeight: 120,
@@ -560,7 +561,7 @@ export const getMessageCardStyles = (theme) => {
 			padding: 1, // This padding creates the border thickness
 			marginVertical: 3,
 			width: "100%",
-			shadowColor: theme.accent,
+			// shadowColor: theme.accent,
 			shadowOffset: { width: 0, height: 0 },
 			shadowRadius: 5,
 			shadowOpacity: 0.8,
