@@ -265,6 +265,33 @@ export function startMobileBridge(port: number) {
 			const workspacePath = workspaceFolders ? workspaceFolders[0].uri.fsPath : "No workspace open";
 			res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
 			res.end(JSON.stringify({ status: "ok", workspacePath }));
+		} else if (req.method === "POST" && req.url?.startsWith("/tasks/") && req.url.endsWith("/condense")) {
+			const taskId = req.url.split("/")[2];
+			if (!taskId) {
+				res.writeHead(400, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+				res.end(JSON.stringify({ error: "Task ID is required" }));
+				return;
+			}
+			try {
+				const provider = await ClineProvider.getInstance();
+				if (!provider) {
+					res.writeHead(500, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+					res.end(JSON.stringify({ error: "Kilo Code is not running" }));
+					return;
+				}
+				const task = provider.getCurrentTask();
+				if (!task || task.taskId !== taskId) {
+					res.writeHead(404, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+					res.end(JSON.stringify({ error: "Task not found or not active" }));
+					return;
+				}
+				await task.condenseContext();
+				res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+				res.end(JSON.stringify({ status: "ok" }));
+			} catch (error) {
+				res.writeHead(500, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+				res.end(JSON.stringify({ error: error.message }));
+			}
 		} else {
 			res.writeHead(404, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
 			res.end(JSON.stringify({ error: "Not Found" }));

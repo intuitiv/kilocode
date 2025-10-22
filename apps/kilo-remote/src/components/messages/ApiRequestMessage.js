@@ -7,6 +7,7 @@ import MessageCard from './MessageCard';
 
 const ApiRequestMessage = ({ item }) => {
   const { theme, isVerbose } = useTheme();
+  const [expanded, setExpanded] = useState(false);
   const styles = getApiRequestMessageStyles(theme);
   const request = JSON.parse(item.text);
 
