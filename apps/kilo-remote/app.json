@@ -27,13 +27,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.aet.kilocanvas"
     },
     "web": {
       "favicon": "./assets/icon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font", "./plugins/disablePushNotifications"
     ]
   }
 }

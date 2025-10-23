@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "clean": "rm -rf node_modules package-lock.json ios/Pods && npm install",
     "cleanPod": "rm -rf node_modules package-lock.json ios/Pods && npm install && cd ios && pod install && cd ..",
-    "prebuild": "expo prebuild",
+    "prebuild": "rm -rf ios && npx expo prebuild --clean",
     "build:ios": "expo build:ios",
     "dev-build": "./dev-build.sh"
   },

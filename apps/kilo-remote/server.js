@@ -189,8 +189,7 @@ const sampleMessages = [
 	//     "ask": "tool",
 	//     "text": "{\"tool\":\"listFilesTopLevel\",\"path\":\"apps/kilo-remote/src/styles\",\"isOutsideWorkspace\":false,\"content\":\"ambient.js\n animations.js\nmessages.js\nmodes.js\ntext-treatments.js\ntheme.js\ntransitions.js\ntypography.js\"}",
 	//     "isProtected": false
-	// }
-,
+	// },
 	{
 		ts: 1761017879437,
 		type: "ask",
@@ -267,7 +266,9 @@ const handleStreamRequest = (req, res, message, taskId) => {
 	const sendEvent = (index) => {
 		if (index < sampleMessages.length) {
 			const message = sampleMessages[index]
-			res.write(`data: ${JSON.stringify(message)}\n\n`)
+			if (message) {
+				res.write(`data: ${JSON.stringify(message)}\n\n`)
+			}
 			setTimeout(() => sendEvent(index + 1), 250)
 		} else {
 			// Send end-of-stream for web clients

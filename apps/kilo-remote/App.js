@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, View } from 'react-native';
 import { NavigationContainer, useNavigation, DefaultTheme } from '@react-navigation/native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useFonts } from 'expo-font';
@@ -12,6 +13,7 @@ import HeaderControls from './src/components/HeaderControls';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { useTheme } from './src/hooks/useTheme';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,7 +36,7 @@ function ChatStack() {
   );
 }
 
-function MainTabs() {
+function MainTabs({ insets }) {
   const { theme } = useTheme();
   return (
     <Tab.Navigator
@@ -53,8 +55,8 @@ function MainTabs() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: theme.background,
-          height: 50,
-          paddingBottom: 5,
+          height: 50 + insets.bottom / 2,
+          paddingBottom: insets.bottom / 2,
         },
         tabBarActiveTintColor: theme.accent,
         tabBarInactiveTintColor: theme.dim,
@@ -68,6 +70,7 @@ function MainTabs() {
 
 const AppContent = () => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [fontsLoaded] = useFonts({
     'JetBrainsMono-Regular': require('./assets/fonts/JetBrainsMono-Regular.ttf'),
@@ -96,13 +99,13 @@ const AppContent = () => {
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name="Main"
-          component={MainTabs}
+          component={() => <MainTabs insets={insets} />}
           options={{
             headerTitle: () => <HeaderTitle />,
             headerRight: () => <HeaderControls />,
             headerTitleAlign: 'left',
             headerLeft: () => null,
-            headerStyle: { backgroundColor: theme.background, height: 70 },
+            headerStyle: { backgroundColor: theme.background, height: 70 + insets.top / 2 },
           }}
         />
       </Stack.Navigator>
@@ -112,8 +115,10 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

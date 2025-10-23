@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react"
-import { View, Text, FlatList, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native"
+import { View, Text, FlatList, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
+import { useHeaderHeight } from '@react-navigation/elements';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PinnedMessage from "./PinnedMessage"
 import ChatInput from "./ChatInput"
 import ChatRow from "./ChatRow"
@@ -29,6 +31,8 @@ const ChatView = ({ route }) => {
 	const styles = getChatViewStyles(theme)
 	const flatListRef = useRef(null)
 	const inputRef = useRef(null)
+	const headerHeight = useHeaderHeight();
+	const insets = useSafeAreaInsets();
 
 	const modeStyles = getModeStyles(theme)
 	const activeModeStyle = modeStyles[mode] || modeStyles.architect
@@ -47,6 +51,8 @@ const ChatView = ({ route }) => {
 					if (data) {
 						console.log("History data received:", data)
 						setMessages(data)
+					} else {
+						setMessages([])
 					}
 				})
 			} else {
@@ -144,37 +150,38 @@ const ChatView = ({ route }) => {
 	), [onSuggestionPress]);
 
 	return (
-		<View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
-			{BackgroundComponent}
-			<PinnedMessage message={pinnedMessage} />
-			<KeyboardAvoidingView
-				style={{ flex: 1 }}
-				behavior={Platform.OS === "ios" ? "padding" : undefined}
-				keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}>
-				<FlatList
-					ref={flatListRef}
-					data={messages}
-					keyExtractor={(item, index) => `${item.ts}-${index}`}
-					renderItem={renderItem}
-					onScrollBeginDrag={() => setExpandedMessageId(null)}
-					contentContainerStyle={{ padding: 10, paddingBottom: 150 }}
-					showsVerticalScrollIndicator={true}
-				/>
-			</KeyboardAvoidingView>
-
-			<View style={styles.inputContainer}>
-				<ChatInput
-					inputValue={inputValue}
-					setInputValue={setInputValue}
-					isStreaming={isStreaming}
-					handleSend={handleSend}
-					handleCancel={handleCancel}
-					mode={mode}
-					onModeChange={setMode}
-					inputRef={inputRef}
-				/>
-			</View>
-		</View>
+		<KeyboardAvoidingView
+			style={{ flex: 1 }}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+			keyboardVerticalOffset={headerHeight + insets.top}>
+			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+				<View style={[styles.container, { fontFamily: activeModeStyle.font }]}>
+					{BackgroundComponent}
+					<PinnedMessage message={pinnedMessage} />
+					<FlatList
+						ref={flatListRef}
+						data={messages}
+						keyExtractor={(item, index) => `${item.ts}-${index}`}
+						renderItem={renderItem}
+						onScrollBeginDrag={() => setExpandedMessageId(null)}
+						contentContainerStyle={{ paddingBottom: insets.bottom + 150 }}
+						showsVerticalScrollIndicator={true}
+					/>
+					<View style={styles.inputContainer}>
+						<ChatInput
+							inputValue={inputValue}
+							setInputValue={setInputValue}
+							isStreaming={isStreaming}
+							handleSend={handleSend}
+							handleCancel={handleCancel}
+							mode={mode}
+							onModeChange={setMode}
+							inputRef={inputRef}
+						/>
+					</View>
+				</View>
+			</TouchableWithoutFeedback>
+		</KeyboardAvoidingView>
 	)
 }
 
