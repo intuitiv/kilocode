@@ -6,7 +6,12 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "clean": "rm -rf node_modules package-lock.json ios/Pods && npm install",
+    "cleanPod": "rm -rf node_modules package-lock.json ios/Pods && npm install && cd ios && pod install && cd ..",
+    "prebuild": "expo prebuild",
+    "build:ios": "expo build:ios",
+    "dev-build": "./dev-build.sh"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.1.3",

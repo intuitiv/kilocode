@@ -17,7 +17,6 @@ export const getChatInputStyles = (theme) => {
 		},
 		textInput: {
 			borderWidth: 0,
-			outlineStyle: 'none', 
 			padding: 8, // compact
 			minHeight: 48, // smaller
 			maxHeight: 120,

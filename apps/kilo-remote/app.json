@@ -15,6 +15,11 @@
       "**/*"
     ],
     "ios": {
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.aet.kilo-canvas"
     },

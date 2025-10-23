@@ -42,11 +42,11 @@ export const darkTheme = {
 
   // ---- Gradients & Glow ----
   rainbowGradient: [
-    '#A8FFBF', // soft mint
-    '#6BFF9C', // bright lime-green
-    '#00E6A0', // teal-green
-    '#009E80', // medium jade
-    '#005F4A', // deep emerald
+    '#7FDFA5', // soft muted mint
+    '#4FD98C', // pleasant mid-lime
+    '#25B97A', // balanced green-teal
+    '#1E8C68', // rich jade tone
+    '#0E5A45', // deep emerald anchor
   ],
 
   // ---- Syntax Highlighting ----

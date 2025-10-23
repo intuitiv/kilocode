@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableOpacity, Pressable } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
@@ -17,7 +17,7 @@ const KiloSaidMessage = ({ item, isUserFeedback }) => {
 
   if (!isVerbose) {
     return (
-      <TouchableWithoutFeedback onPress={() => { /* Stop propagation */ }}>
+      <Pressable onPress={() => { /* Stop propagation */ }}>
         <MessageCard>
           <TouchableOpacity onPress={handlePress}>
             <View style={[!isExpanded && { maxHeight: 65, overflow: 'hidden' }, isUserFeedback && { backgroundColor: theme.dim }]}>
@@ -33,7 +33,7 @@ const KiloSaidMessage = ({ item, isUserFeedback }) => {
             </View>
           </TouchableOpacity>
         </MessageCard>
-      </TouchableWithoutFeedback>
+      </Pressable>
     );
   }
 
