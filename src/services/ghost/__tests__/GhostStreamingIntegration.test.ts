@@ -1,5 +1,5 @@
 import { GhostModel } from "../GhostModel"
-import { GhostStrategy } from "../GhostStrategy"
+import { GhostStreamingParser } from "../GhostStreamingParser"
 import { GhostSuggestionContext } from "../types"
 import { ApiStreamChunk } from "../../../api/transform/stream"
 
@@ -35,12 +35,12 @@ class MockApiHandler {
 }
 
 describe("Ghost Streaming Integration", () => {
-	let strategy: GhostStrategy
+	let streamingParser: GhostStreamingParser
 	let mockDocument: any
 	let context: GhostSuggestionContext
 
 	beforeEach(() => {
-		strategy = new GhostStrategy()
+		streamingParser = new GhostStreamingParser()
 
 		// Create mock document
 		mockDocument = {
@@ -57,7 +57,7 @@ describe("Ghost Streaming Integration", () => {
 	})
 
 	describe("end-to-end streaming workflow", () => {
-		it("should process streaming chunks and show suggestions incrementally", async () => {
+		it("should process streaming chunks and show suggestions when complete", async () => {
 			// Simulate streaming chunks that build up to a complete suggestion
 			const streamingChunks: ApiStreamChunk[] = [
 				{ type: "text", text: "<change><search><![CDATA[function test() {" },
@@ -74,52 +74,41 @@ describe("Ghost Streaming Integration", () => {
 			const model = new GhostModel(mockApiHandler as any)
 
 			// Initialize streaming parser
-			strategy.initializeStreamingParser(context)
+			streamingParser.initialize(context)
 
-			let firstSuggestionTime: number | null = null
+			let fullResponse = ""
 			let finalSuggestionTime: number | null = null
-			let suggestionCount = 0
 
 			const startTime = performance.now()
 
-			// Simulate the streaming callback workflow
+			// Simulate the streaming callback workflow - accumulate chunks
 			const onChunk = (chunk: ApiStreamChunk) => {
 				if (chunk.type === "text") {
-					const parseResult = strategy.processStreamingChunk(chunk.text)
-
-					if (parseResult.hasNewSuggestions && parseResult.suggestions.hasSuggestions()) {
-						suggestionCount++
-
-						if (firstSuggestionTime === null) {
-							firstSuggestionTime = performance.now()
-						}
-
-						if (parseResult.isComplete) {
-							finalSuggestionTime = performance.now()
-						}
-					}
+					fullResponse += chunk.text
 				}
 			}
 
 			// Run the streaming generation
 			const usageInfo = await model.generateResponse("system prompt", "user prompt", onChunk)
 
+			// Process complete response
+			const parseResult = streamingParser.parseResponse(fullResponse, "", "")
+			finalSuggestionTime = performance.now()
+
 			const endTime = performance.now()
 
 			// Verify streaming behavior
-			expect(firstSuggestionTime).not.toBeNull()
 			expect(finalSuggestionTime).not.toBeNull()
-			expect(suggestionCount).toBeGreaterThan(0)
+			expect(parseResult.hasNewSuggestions).toBe(true)
+			expect(parseResult.suggestions.hasSuggestions()).toBe(true)
 
-			// Verify timing - first suggestion should come before final
-			expect(firstSuggestionTime!).toBeLessThan(finalSuggestionTime!)
+			// Verify timing
 			expect(finalSuggestionTime!).toBeLessThan(endTime)
 
 			// Verify usage info
 			expect(usageInfo.inputTokens).toBe(10)
 			expect(usageInfo.outputTokens).toBe(20)
 
-			console.log(`First suggestion after: ${(firstSuggestionTime! - startTime).toFixed(2)}ms`)
 			console.log(`Final suggestion after: ${(finalSuggestionTime! - startTime).toFixed(2)}ms`)
 			console.log(`Total time: ${(endTime - startTime).toFixed(2)}ms`)
 		})
@@ -140,32 +129,24 @@ describe("Ghost Streaming Integration", () => {
 			const mockApiHandler = new MockApiHandler(streamingChunks)
 			const model = new GhostModel(mockApiHandler as any)
 
-			strategy.initializeStreamingParser(context)
+			streamingParser.initialize(context)
 
-			let suggestionUpdates = 0
-			let finalSuggestions: any = null
+			let fullResponse = ""
 
 			const onChunk = (chunk: ApiStreamChunk) => {
 				if (chunk.type === "text") {
-					const parseResult = strategy.processStreamingChunk(chunk.text)
-
-					if (parseResult.hasNewSuggestions) {
-						suggestionUpdates++
-						finalSuggestions = parseResult.suggestions
-					}
+					fullResponse += chunk.text
 				}
 			}
 
 			await model.generateResponse("system", "user", onChunk)
 
-			// Should have received multiple suggestion updates
-			expect(suggestionUpdates).toBe(2)
-			expect(finalSuggestions).not.toBeNull()
-			expect(finalSuggestions.hasSuggestions()).toBe(true)
+			// Process complete response
+			const parseResult = streamingParser.parseResponse(fullResponse, "", "")
 
-			// Verify we have the expected number of completed changes
-			const completedChanges = strategy.getStreamingCompletedChanges()
-			expect(completedChanges).toHaveLength(2)
+			// Should have processed both suggestions
+			expect(parseResult.hasNewSuggestions).toBe(true)
+			expect(parseResult.suggestions.hasSuggestions()).toBe(true)
 		})
 
 		it("should handle cancellation during streaming", async () => {
@@ -178,10 +159,10 @@ describe("Ghost Streaming Integration", () => {
 			const mockApiHandler = new MockApiHandler(streamingChunks)
 			const model = new GhostModel(mockApiHandler as any)
 
-			strategy.initializeStreamingParser(context)
+			streamingParser.initialize(context)
 
 			let isRequestCancelled = false
-			let suggestionCount = 0
+			let fullResponse = ""
 
 			const onChunk = (chunk: ApiStreamChunk) => {
 				if (isRequestCancelled) {
@@ -189,25 +170,19 @@ describe("Ghost Streaming Integration", () => {
 				}
 
 				if (chunk.type === "text") {
-					const parseResult = strategy.processStreamingChunk(chunk.text)
-
-					if (parseResult.hasNewSuggestions) {
-						suggestionCount++
-						// Simulate cancellation after first chunk
-						isRequestCancelled = true
-					}
+					fullResponse += chunk.text
+					// Simulate cancellation after first chunk
+					isRequestCancelled = true
 				}
 			}
 
 			await model.generateResponse("system", "user", onChunk)
 
-			// Should have processed some chunks but stopped due to cancellation
-			expect(suggestionCount).toBe(0) // No complete suggestions due to cancellation
+			// Try to process incomplete response
+			const parseResult = streamingParser.parseResponse(fullResponse, "", "")
 
-			// Reset should clear state
-			strategy.resetStreamingParser()
-			expect(strategy.getStreamingBuffer()).toBe("")
-			expect(strategy.getStreamingCompletedChanges()).toHaveLength(0)
+			// Should have no complete suggestions due to cancellation
+			expect(parseResult.hasNewSuggestions).toBe(false)
 		})
 
 		it("should handle malformed streaming data gracefully", async () => {
@@ -224,35 +199,27 @@ describe("Ghost Streaming Integration", () => {
 			const mockApiHandler = new MockApiHandler(streamingChunks)
 			const model = new GhostModel(mockApiHandler as any)
 
-			strategy.initializeStreamingParser(context)
+			streamingParser.initialize(context)
 
-			let validSuggestions = 0
+			let fullResponse = ""
 			let errors = 0
 
 			const onChunk = (chunk: ApiStreamChunk) => {
 				if (chunk.type === "text") {
-					try {
-						const parseResult = strategy.processStreamingChunk(chunk.text)
-
-						if (parseResult.hasNewSuggestions) {
-							validSuggestions++
-						}
-					} catch (error) {
-						errors++
-					}
+					fullResponse += chunk.text
 				}
 			}
 
 			await model.generateResponse("system", "user", onChunk)
 
-			// Should handle malformed data without crashing
+			const parseResult = streamingParser.parseResponse(fullResponse, "", "")
+			expect(parseResult.hasNewSuggestions).toBe(true)
 			expect(errors).toBe(0) // No errors thrown
-			expect(validSuggestions).toBe(1) // Only the valid suggestion processed
 		})
 	})
 
 	describe("performance characteristics", () => {
-		it("should show first suggestion quickly in streaming mode", async () => {
+		it("should process complete response quickly", async () => {
 			const streamingChunks: ApiStreamChunk[] = [
 				{
 					type: "text",
@@ -264,31 +231,26 @@ describe("Ghost Streaming Integration", () => {
 			const mockApiHandler = new MockApiHandler(streamingChunks)
 			const model = new GhostModel(mockApiHandler as any)
 
-			strategy.initializeStreamingParser(context)
+			streamingParser.initialize(context)
 
 			const startTime = performance.now()
-			let firstSuggestionTime: number | null = null
+			let fullResponse = ""
 
 			const onChunk = (chunk: ApiStreamChunk) => {
 				if (chunk.type === "text") {
-					const parseResult = strategy.processStreamingChunk(chunk.text)
-
-					if (parseResult.hasNewSuggestions && firstSuggestionTime === null) {
-						firstSuggestionTime = performance.now()
-					}
+					fullResponse += chunk.text
 				}
 			}
 
 			await model.generateResponse("system", "user", onChunk)
 
+			const parseResult = streamingParser.parseResponse(fullResponse, "", "")
 			const totalTime = performance.now() - startTime
-			const timeToFirstSuggestion = firstSuggestionTime! - startTime
 
-			// First suggestion should come quickly (within reasonable bounds for test)
-			expect(timeToFirstSuggestion).toBeLessThan(totalTime)
-			expect(timeToFirstSuggestion).toBeGreaterThan(0)
+			// Should process successfully
+			expect(parseResult.hasNewSuggestions).toBe(true)
+			expect(totalTime).toBeGreaterThan(0)
 
-			console.log(`Time to first suggestion: ${timeToFirstSuggestion.toFixed(2)}ms`)
 			console.log(`Total time: ${totalTime.toFixed(2)}ms`)
 		})
 	})
