@@ -5,7 +5,7 @@ import { useTheme } from '../hooks/useTheme';
 import { getHomeScreenStyles } from '../styles';
 
 const HomeScreen = ({ navigation }) => {
-  const [url, setUrl] = useState('http://localhost:3000');
+  const [url, setUrl] = useState('http://aet-mac.badger-corn.ts.net:3000');
   const { theme } = useTheme();
   const styles = getHomeScreenStyles(theme);
 
