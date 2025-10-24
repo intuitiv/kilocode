@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity } from 'react-native';
+import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useTheme } from '../hooks/useTheme';
@@ -41,6 +41,7 @@ const ChatInput = ({
         onKeyPress={(e) => {
           if (e.nativeEvent.key === 'Enter' && e.nativeEvent.metaKey) {
             handleSend();
+            Keyboard.dismiss(); // Hide keyboard on CMD+Enter
           }
         }}
       />
@@ -73,7 +74,13 @@ const ChatInput = ({
             <Icon name="stop" size={22} style={styles.cancelIcon} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+          <TouchableOpacity
+            onPress={() => {
+              handleSend();
+              Keyboard.dismiss(); // Hide keyboard when pressing Send button
+            }}
+            style={styles.sendButton}
+          >
             <Icon name="send" size={22} style={styles.sendIcon} />
           </TouchableOpacity>
         )}
