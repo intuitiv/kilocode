@@ -99,7 +99,6 @@ const AppContent = () => {
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name="Main"
-          component={() => <MainTabs insets={insets} />}
           options={{
             headerTitle: () => <HeaderTitle />,
             headerRight: () => <HeaderControls />,
@@ -107,7 +106,9 @@ const AppContent = () => {
             headerLeft: () => null,
             headerStyle: { backgroundColor: theme.background, height: 70 + insets.top / 2 },
           }}
-        />
+        >
+          {(props) => <MainTabs {...props} insets={insets} />}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

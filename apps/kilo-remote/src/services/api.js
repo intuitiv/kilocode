@@ -1,12 +1,16 @@
 import { getServerUrl } from '../config';
 import EventSource from 'react-native-event-source';
 
-export const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
-  const fullUrl = new URL(url);
-  if (body.taskId) fullUrl.searchParams.append('taskId', body.taskId);
-  if (body.message) fullUrl.searchParams.append('message', body.message);
+let eventSource = null;
 
-  const eventSource = new EventSource(fullUrl.toString());
+export const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
+  eventSource = new EventSource(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
 
   eventSource.addEventListener('open', () => {
     console.log('SSE connection opened.');
@@ -48,7 +52,7 @@ export const stream = (url, body, onMessage, onError, onComplete, onTaskId) => {
 export const startNewTask = (message, onMessage, onError, onComplete, onTaskId) => {
   const url = `${getServerUrl()}/new-task`;
   const body = { message };
-  stream(url, body, onMessage, onError, onComplete, onTaskId);
+  return stream(url, body, onMessage, onError, onComplete, onTaskId);
 };
 
 export const sendFollowup = (taskId, message, onMessage, onError, onComplete) => {
@@ -58,10 +62,14 @@ export const sendFollowup = (taskId, message, onMessage, onError, onComplete) =>
   }
   const url = `${getServerUrl()}/send-followup`;
   const body = { taskId, message };
-  stream(url, body, onMessage, onError, onComplete);
+  return stream(url, body, onMessage, onError, onComplete);
 };
 
 export const cancelTask = async (taskId) => {
+  if (eventSource) {
+    eventSource.close();
+    eventSource = null;
+  }
   if (taskId) {
     try {
       await fetch(`${getServerUrl()}/cancel-task`, {

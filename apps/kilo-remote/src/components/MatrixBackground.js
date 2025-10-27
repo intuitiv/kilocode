@@ -68,7 +68,7 @@ const MatrixBackground = () => {
 			))}
 
 			{/* Frosted glass overlay */}
-			<BlurView intensity={15} tint="dark" style={StyleSheet.absoluteFill} />
+			<BlurView intensity={10} tint="light" style={StyleSheet.absoluteFill} />
 
 			{/* Slight translucent overlay for text readability */}
 			<View

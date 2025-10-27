@@ -25,6 +25,7 @@ export const getChatInputStyles = (theme) => {
 			fontFamily: theme.fonts.main,
 			fontSize: 13,
 			lineHeight: 18,
+			outlineStyle: "none",
 		},
 		bottomBar: {
 			flexDirection: "row",

@@ -4,7 +4,7 @@ This document outlines the API for the Kilo Code Mobile Bridge, which allows ext
 
 ## Endpoints
 
-All endpoints are available on `http://127.0.0.1:8080`.
+All endpoints are available on `http://127.0.0.1:3000`.
 
 ### `POST /new-task`
 
@@ -21,7 +21,7 @@ Creates a new Kilo task and starts an SSE stream for that task.
 **cURL Command:**
 
 ```bash
-curl -N -X POST -H "Content-Type: application/json" -d '{"message": "Hello, Kilo!"}' http://127.0.0.1:8080/new-task
+curl -N -X POST -H "Content-Type: application/json" -d '{"message": "Hello, Kilo!"}' http://127.0.0.1:3000/new-task
 ```
 
 **Response:**
@@ -136,7 +136,7 @@ Sends a follow-up message to an existing task.
 **cURL Command:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"taskId": "YOUR_TASK_ID", "message": "This is a follow-up message."}' http://127.0.0.1:8080/send-followup
+curl -X POST -H "Content-Type: application/json" -d '{"taskId": "YOUR_TASK_ID", "message": "This is a follow-up message."}' http://127.0.0.1:3000/send-followup
 ```
 
 **Response:**
@@ -164,7 +164,7 @@ Cancels an ongoing task.
 **cURL Command:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"taskId": "YOUR_TASK_ID"}' http://127.0.0.1:8080/cancel-task
+curl -X POST -H "Content-Type: application/json" -d '{"taskId": "YOUR_TASK_ID"}' http://127.0.0.1:3000/cancel-task
 ```
 
 **Response:**
@@ -182,7 +182,7 @@ Returns a list of all tasks in the history.
 **cURL Command:**
 
 ```bash
-curl http://127.0.0.1:8080/tasks
+curl http://127.0.0.1:3000/tasks
 ```
 
 **Response:**
@@ -219,7 +219,7 @@ Returns the full message history for a single task.
 **cURL Command:**
 
 ```bash
-curl http://127.0.0.1:8080/tasks/YOUR_TASK_ID
+curl http://127.0.0.1:3000/tasks/YOUR_TASK_ID
 ```
 
 **Response:**
@@ -237,7 +237,7 @@ Returns a condensed summary of a single task.
 **cURL Command:**
 
 ```bash
-curl "http://127.0.0.1:8080/tasks/YOUR_TASK_ID/condensed?workspace=YOUR_WORKSPACE"
+curl "http://127.0.0.1:3000/tasks/YOUR_TASK_ID/condensed?workspace=YOUR_WORKSPACE"
 ```
 
 **Response:**
@@ -255,7 +255,7 @@ Returns a list of available modes.
 **cURL Command:**
 
 ```bash
-curl http://127.0.0.1:8080/modes
+curl http://127.0.0.1:3000/modes
 ```
 
 **Response:**
@@ -277,7 +277,7 @@ Changes the current mode.
 **cURL Command:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"mode": "code"}' http://127.0.0.1:8080/modes
+curl -X POST -H "Content-Type: application/json" -d '{"mode": "code"}' http://127.0.0.1:3000/modes
 ```
 
 **Response:**
@@ -295,7 +295,7 @@ Returns the health status of the mobile bridge and basic workspace information.
 **cURL Command:**
 
 ```bash
-curl http://127.0.0.1:8080/health
+curl http://127.0.0.1:3000/health
 ```
 
 **Response:**
