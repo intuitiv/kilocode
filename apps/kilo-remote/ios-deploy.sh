@@ -1,14 +1,16 @@
 #!/bin/bash
 set -e
 
-# Usage: ./deploy.sh simulator "iPhone 16" 
-#        ./deploy.sh device "iPhone 16e"
+# This script is used to deploy the app to an iOS device or simulator.
+# It assumes that Xcode is already installed on your machine.
 
-TARGET_TYPE="device"   # simulator or device
-TARGET_NAME="iPhone"   # name of simulator or device
+# Usage: ./ios-deploy.sh [simulator|device] [Device/Simulator Name]
+# Example: ./ios-deploy.sh simulator "iPhone 14"
+#          ./ios-deploy.sh device "My iPhone"
 
-# TARGET_TYPE="simulator"   # simulator or device
-# TARGET_NAME="iPhone 16 Pro Max"   # name of simulator or device
+TARGET_TYPE=${1:-"device"}   # simulator or device
+TARGET_NAME=${2:-"iPhone"}   # name of simulator or device
+
 METRO_HOST="lan"
 WAIT_TIME_METRO=10
 MAX_RETRIES=12
