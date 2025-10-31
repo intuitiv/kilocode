@@ -261,6 +261,9 @@ describe("mergeExtensionState", () => {
 			remoteControlEnabled: false,
 			taskSyncEnabled: false,
 			featureRoomoteControlEnabled: false,
+			remoteBridgeEnabled: false,
+			mobileBridgePort: 8080,
+			mobileBridgeStatus: "stopped",
 		}
 
 		const prevState: ExtensionState = {
