@@ -484,6 +484,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				apiConversationHistoryFilePath: "/test/path/api_history.json",
 				uiMessagesFilePath: "/test/path/ui_messages.json",
 				apiConversationHistory: [],
+				uiMessages: [],
 			})
 
 			// Mock handleModeSwitch to track calls
@@ -687,6 +688,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				apiConversationHistoryFilePath: "/test/path/api_history.json",
 				uiMessagesFilePath: "/test/path/ui_messages.json",
 				apiConversationHistory: [],
+				uiMessages: [],
 			})
 
 			// Mock handleModeSwitch to track calls
@@ -773,6 +775,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				apiConversationHistoryFilePath: "/test/path/api_history.json",
 				uiMessagesFilePath: "/test/path/ui_messages.json",
 				apiConversationHistory: [],
+				uiMessages: [],
 			})
 
 			// Mock handleModeSwitch to track calls
@@ -1174,6 +1177,7 @@ describe("ClineProvider - Sticky Mode", () => {
 					apiConversationHistoryFilePath: "/test/path/api_history.json",
 					uiMessagesFilePath: "/test/path/ui_messages.json",
 					apiConversationHistory: [],
+					uiMessages: [],
 				}
 			})
 
