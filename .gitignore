@@ -68,6 +68,8 @@ qdrant_storage/
 # to make it easier to work on features in parallel
 *.code-workspace
 
-# generated fiels in kilo-remote app
-./apps/kilo-remote/ios/*
-./apps/kilo-remote/node_modules/*
+
+# Ignore auto-generated mobile directories
+apps/kilo-remote/android/
+apps/kilo-remote/ios/
+apps/kilo-remote/node_modules/

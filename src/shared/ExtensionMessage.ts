@@ -96,6 +96,7 @@ export interface ExtensionMessage {
 		| "updatePrompt"
 		| "systemPrompt"
 		| "autoApprovalEnabled"
+		| "yoloMode" // kilocode_change
 		| "updateCustomMode"
 		| "deleteCustomMode"
 		| "exportModeResult"
@@ -152,6 +153,7 @@ export interface ExtensionMessage {
 		| "commands"
 		| "insertTextIntoTextarea"
 		| "dismissedUpsells"
+		| "showTimestamps" // kilocode_change
 		| "organizationSwitchResult"
 		| "mobileBridgeStatus"
 	text?: string
@@ -279,6 +281,7 @@ export type ExtensionState = Pick<
 	// | "taskHistory" // Optional in GlobalSettings, required here.
 	| "dismissedUpsells"
 	| "autoApprovalEnabled"
+	| "yoloMode" // kilocode_change
 	| "alwaysAllowReadOnly"
 	| "alwaysAllowReadOnlyOutsideWorkspace"
 	| "alwaysAllowWrite"
@@ -302,6 +305,7 @@ export type ExtensionState = Pick<
 	| "browserToolEnabled"
 	| "browserViewportSize"
 	| "showAutoApproveMenu" // kilocode_change
+	| "hideCostBelowThreshold" // kilocode_change
 	| "screenshotQuality"
 	| "remoteBrowserEnabled"
 	| "cachedChromeHostUrl"
@@ -410,6 +414,8 @@ export type ExtensionState = Pick<
 	settingsImportedAt?: number
 	historyPreviewCollapsed?: boolean
 	showTaskTimeline?: boolean // kilocode_change
+	sendMessageOnEnter?: boolean // kilocode_change
+	hideCostBelowThreshold?: number // kilocode_change
 
 	cloudUserInfo: CloudUserInfo | null
 	cloudIsAuthenticated: boolean
@@ -440,6 +446,7 @@ export type ExtensionState = Pick<
 	remoteBridgeEnabled: boolean
 	mobileBridgePort: number
 	mobileBridgeStatus: string
+	showTimestamps?: boolean // kilocode_change: Show timestamps in chat messages
 }
 
 export interface ClineSayTool {
@@ -558,7 +565,10 @@ export interface ClineApiReqInfo {
 	cacheWrites?: number
 	cacheReads?: number
 	cost?: number
-	usageMissing?: boolean // kilocode_change
+	// kilocode_change
+	usageMissing?: boolean
+	inferenceProvider?: string
+	// kilocode_change end
 	cancelReason?: ClineApiReqCancelReason
 	streamingFailedMessage?: string
 	apiProtocol?: "anthropic" | "openai"
