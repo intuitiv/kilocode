@@ -4,12 +4,14 @@
  */
 
 import { atom } from "jotai"
+import { atomWithReset } from "jotai/utils"
 import type { CliMessage } from "../../types/cli.js"
 import type { ExtensionChatMessage } from "../../types/messages.js"
 import type { CommandSuggestion, ArgumentSuggestion } from "../../services/autocomplete.js"
 import { chatMessagesAtom } from "./extension.js"
 import { splitMessages } from "../../ui/messages/utils/messageCompletion.js"
 import { textBufferStringAtom, textBufferCursorAtom, setTextAtom, clearTextAtom } from "./textBuffer.js"
+import { commitCompletionTimeout } from "../../parallel/parallel.js"
 
 /**
  * Unified message type that can represent both CLI and extension messages
@@ -45,6 +47,18 @@ export const messageCutoffTimestampAtom = atom<number>(0)
  * Atom to hold UI error messages
  */
 export const errorAtom = atom<string | null>(null)
+
+/**
+ * Atom to track when parallel mode is committing changes
+ * Used to disable input and show "Committing your changes..." message
+ */
+export const isCommittingParallelModeAtom = atom<boolean>(false)
+
+/**
+ * Atom to track countdown timer for parallel mode commit (in seconds)
+ * Starts at 60 and counts down to 0
+ */
+export const commitCountdownSecondsAtom = atomWithReset<number>(commitCompletionTimeout / 1000)
 
 /**
  * Derived atom to check if the extension is currently streaming/processing
@@ -246,7 +260,7 @@ export const lastMessageAtom = atom<CliMessage | null>((get) => {
 
 /**
  * Derived atom to get the last ask message from extension messages
- * Returns the most recent unanswered ask message that requires user approval, or null if none exists
+ * Returns the most recent ask message that requires user approval, or null if none exists
  */
 export const lastAskMessageAtom = atom<ExtensionChatMessage | null>((get) => {
 	const messages = get(chatMessagesAtom)
@@ -254,21 +268,17 @@ export const lastAskMessageAtom = atom<ExtensionChatMessage | null>((get) => {
 	// Ask types that require user approval
 	const approvalAskTypes = ["tool", "command", "browser_action_launch", "use_mcp_server"]
 
-	// Find the last unanswered ask message that requires approval
-	for (let i = messages.length - 1; i >= 0; i--) {
-		const msg = messages[i]
-		if (
-			msg &&
-			msg.type === "ask" &&
-			!msg.isAnswered &&
-			msg.ask &&
-			approvalAskTypes.includes(msg.ask) &&
-			!msg.partial
-		) {
-			return msg
-		}
+	const lastMessage = messages[messages.length - 1]
+	if (
+		lastMessage &&
+		lastMessage.type === "ask" &&
+		!lastMessage.isAnswered &&
+		lastMessage.ask &&
+		approvalAskTypes.includes(lastMessage.ask) &&
+		!lastMessage.partial
+	) {
+		return lastMessage
 	}
-
 	return null
 })
 
