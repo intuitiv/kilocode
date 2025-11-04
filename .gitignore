@@ -73,3 +73,6 @@ qdrant_storage/
 apps/kilo-remote/android/
 apps/kilo-remote/ios/
 apps/kilo-remote/node_modules/
+
+# Kilo Remote environment file
+apps/kilo-remote/.env

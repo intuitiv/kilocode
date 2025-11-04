@@ -26,9 +26,9 @@ graph TD
 
 The Mobile Bridge Backend is an MobileBridge.ts server responsible for the following:
 
-*   Exposing a set of API endpoints for clients to interact with.
-*   Communicating with the Kilo Code VS Code extension to create and manage tasks.
-*   Streaming task progress and results back to the client using Server-Sent Events (SSE).
+- Exposing a set of API endpoints for clients to interact with.
+- Communicating with the Kilo Code VS Code extension to create and manage tasks.
+- Streaming task progress and results back to the client using Server-Sent Events (SSE).
 
 The backend is implemented in `apps/kilo-remote/MobileBridge.js` and provides the endpoints documented in `apps/kilo-remote/MOBILE_BRIDGE_API.md`.
 
@@ -36,10 +36,10 @@ The backend is implemented in `apps/kilo-remote/MobileBridge.js` and provides th
 
 The remote frontend is a React Native application located in `apps/kilo-remote`. It provides a user interface for:
 
-*   Starting new Kilo Code tasks.
-*   Viewing the progress and results of ongoing tasks.
-*   Interacting with tasks by sending follow-up messages.
-*   Viewing task history.
+- Starting new Kilo Code tasks.
+- Viewing the progress and results of ongoing tasks.
+- Interacting with tasks by sending follow-up messages.
+- Viewing task history.
 
 The frontend communicates with the Mobile Bridge Backend to perform these actions.
 
@@ -103,39 +103,92 @@ graph TD
     G -->|API| H;
 ```
 
-## Setup
+## Prerequisites
 
-### Clean
+Before you begin, ensure you have the following software installed on your system:
 
-To clean up old dependencies and install new ones, run the following command:
+- **Node.js** (LTS version recommended)
+- **npm** or **Yarn**
+- **Watchman** (for macOS): `brew install watchman`
+- **Xcode** and **Xcode Command Line Tools** (for iOS development)
+- **ios-deploy** (for deploying to physical iOS devices): `npm install -g ios-deploy`
+
+## Development Setup
+
+This project uses a script-based approach for consistency across platforms.
+
+### Environment Variables
+
+To connect to your specific Kilo Remote server, you'll need to provide its URL.
+
+1.  Create a new file named `.env` in the `apps/kilo-remote` directory by copying the `.env.example` file.
+2.  In the `.env` file, add the following line, replacing the URL with your server's address:
+
+    ```
+    EXPO_PUBLIC_DEFAULT_WORKSPACE_URL=http://your-server-url:3000
+    ```
+
+    _(Note: The `EXPO_PUBLIC_` prefix is mandatory for variables to be accessible in the Expo client app.)_
+
+The `.env` file is ignored by Git, so your URL will remain private.
+
+### Web Development
+
+**1. Clean & Install**
+Resets your project dependencies. Run this if you encounter issues with packages.
 
 ```bash
-sh setup.sh
+sh scripts/web/clean-install.sh
 ```
 
-### Web
-
-To start the web app, run the following command:
+**2. Develop**
+Starts the Expo development server for the web with live reloading.
 
 ```bash
-npx expo start -c
+sh scripts/web/develop.sh
 ```
 
-### iOS
-
-To deploy the app to an iOS device or simulator, run the following command:
+**3. Deploy Standalone**
+Builds the static web app for production. The output will be generated in the `dist/` directory.
 
 ```bash
-sh ios-deploy.sh [simulator|device] [Device/Simulator Name]
+sh scripts/web/deploy-standalone.sh
 ```
 
-**Example:**
+### iOS Development
+
+**1. Clean & Install**
+A comprehensive script that cleans all dependencies (`node_modules`, `Pods`) and prepares the native iOS project. Run this when starting fresh or encountering build issues.
 
 ```bash
-sh ios-deploy.sh simulator "iPhone 14"
+sh scripts/ios/clean-install.sh
 ```
 
-**Note:** This script assumes that Xcode is already installed on your machine.
+**2. Develop**
+Launches the app on a simulator or a wirelessly connected device with live reloading enabled.
+**Usage:**
+
+```bash
+sh scripts/ios/develop.sh [simulator|device] [Device/Simulator Name]
+```
+
+**Examples:**
+
+```bash
+# Run on the "iPhone 15 Pro" simulator
+sh scripts/ios/develop.sh simulator "iPhone 15 Pro"
+
+# Run on your wirelessly connected iPhone
+sh scripts/ios/develop.sh device "My iPhone"
+```
+
+**3. Deploy Standalone**
+Builds a final, standalone release version (`.ipa`) and installs it on your USB-connected device. It's highly recommended to run the `clean-install.sh` script before this to ensure a pristine build.
+**Usage:**
+
+```bash
+sh scripts/ios/deploy-standalone.sh "My iPhone"
+```
 
 ## Mock Server
 

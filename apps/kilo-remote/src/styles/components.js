@@ -558,10 +558,9 @@ export const getMessageCardStyles = (theme) => {
 	return StyleSheet.create({
 		gradientBorder: {
 			borderRadius: 7, // Outer radius
-			padding: 0.5, // This padding creates the border thickness
+			padding: 0.8, // This padding creates the border thickness
 			marginVertical: 3,
 			width: "100%",
-			// shadowColor: theme.accent,
 			shadowOffset: { width: 0, height: 0 },
 			shadowRadius: 5,
 			shadowOpacity: 0.8,
@@ -569,7 +568,7 @@ export const getMessageCardStyles = (theme) => {
 		},
 		card: {
 			backgroundColor: theme.background,
-			borderRadius: 6, // Inner radius, slightly smaller
+			borderRadius: 5, // Inner radius, slightly smaller
 			padding: 4,
 		},
 		header: {

@@ -2663,6 +2663,10 @@ ${prompt}
 		return this.clineStack[this.clineStack.length - 1]
 	}
 
+	public getTaskById(taskId: string): Task | undefined {
+		return this.clineStack.find((task) => task.taskId === taskId)
+	}
+
 	public getRecentTasks(): string[] {
 		if (this.recentTasksCache) {
 			return this.recentTasksCache
