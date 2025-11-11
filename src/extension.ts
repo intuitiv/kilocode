@@ -396,8 +396,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	await checkAndRunAutoLaunchingTask(context) // kilocode_change
 
-	startMobileBridge(8080)
-
 	const updateMobileBridgeStatus = () => {
 		const status = getBridgeStatus()
 		ClineProvider.getVisibleInstance()?.postMessageToWebview({
