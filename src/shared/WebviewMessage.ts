@@ -186,6 +186,7 @@ export interface WebviewMessage {
 		| "openCustomModesSettings"
 		| "checkpointDiff"
 		| "checkpointRestore"
+		| "requestCheckpointRestoreApproval"
 		| "seeNewChanges" // kilocode_change
 		| "deleteMcpServer"
 		| "maxOpenTabsContext"
@@ -280,6 +281,12 @@ export interface WebviewMessage {
 		| "tasksByIdRequest" // kilocode_change
 		| "taskHistoryRequest" // kilocode_change
 		| "updateGlobalState" // kilocode_change
+		| "autoPurgeEnabled" // kilocode_change
+		| "autoPurgeDefaultRetentionDays" // kilocode_change
+		| "autoPurgeFavoritedTaskRetentionDays" // kilocode_change
+		| "autoPurgeCompletedTaskRetentionDays" // kilocode_change
+		| "autoPurgeIncompleteTaskRetentionDays" // kilocode_change
+		| "manualPurge" // kilocode_change
 		| "shareTaskSuccess"
 		| "exportMode"
 		| "exportModeResult"
@@ -484,6 +491,15 @@ export const checkoutRestorePayloadSchema = z.object({
 })
 
 export type CheckpointRestorePayload = z.infer<typeof checkoutRestorePayloadSchema>
+
+export const requestCheckpointRestoreApprovalPayloadSchema = z.object({
+	commitHash: z.string(),
+	checkpointTs: z.number(),
+	messagesToRemove: z.number(),
+	confirmationText: z.string(),
+})
+
+export type RequestCheckpointRestoreApprovalPayload = z.infer<typeof requestCheckpointRestoreApprovalPayloadSchema>
 
 export interface IndexingStatusPayload {
 	state: "Standby" | "Indexing" | "Indexed" | "Error"

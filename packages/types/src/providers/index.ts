@@ -12,6 +12,8 @@ export * from "./gemini.js"
 export * from "./gemini-cli.js"
 export * from "./ovhcloud.js"
 export * from "./synthetic.js"
+export * from "./inception.js"
+export * from "./minimax.js"
 // kilocode_change end
 export * from "./glama.js"
 export * from "./groq.js"

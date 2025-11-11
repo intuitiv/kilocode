@@ -48,6 +48,7 @@ import {
 	type EditQueuedMessagePayload,
 	checkoutDiffPayloadSchema,
 	checkoutRestorePayloadSchema,
+	requestCheckpointRestoreApprovalPayloadSchema,
 } from "../../shared/WebviewMessage"
 import { checkExistKey } from "../../shared/checkExistApiConfig"
 import { experimentDefault } from "../../shared/experiments"
@@ -85,6 +86,7 @@ import { UsageTracker } from "../../utils/usage-tracker"
 import { seeNewChanges } from "../checkpoints/kilocode/seeNewChanges" // kilocode_change
 import { getTaskHistory } from "../../shared/kilocode/getTaskHistory" // kilocode_change
 import { fetchAndRefreshOrganizationModesOnStartup, refreshOrganizationModes } from "./kiloWebviewMessgeHandlerHelpers"
+import { AutoPurgeScheduler } from "../../services/auto-purge" // kilocode_change
 
 export const webviewMessageHandler = async (
 	provider: ClineProvider,
@@ -814,6 +816,7 @@ export const webviewMessageHandler = async (
 				ollama: {},
 				lmstudio: {},
 				ovhcloud: {}, // kilocode_change
+				inception: {}, // kilocode_change
 			}
 
 			const safeGetModels = async (options: GetModelsOptions): Promise<ModelRecord> => {
@@ -838,7 +841,6 @@ export const webviewMessageHandler = async (
 					key: "openrouter",
 					options: { provider: "openrouter", apiKey: openRouterApiKey, baseUrl: openRouterBaseUrl },
 				},
-				// kilocode_change start
 				{
 					key: "gemini",
 					options: {
@@ -847,7 +849,6 @@ export const webviewMessageHandler = async (
 						baseUrl: apiConfiguration.googleGeminiBaseUrl,
 					},
 				},
-				// kilocode_change end
 				{
 					key: "requesty",
 					options: {
@@ -877,7 +878,6 @@ export const webviewMessageHandler = async (
 						baseUrl: apiConfiguration.deepInfraBaseUrl,
 					},
 				},
-				// kilocode_change start
 				{
 					key: "ovhcloud",
 					options: {
@@ -886,7 +886,14 @@ export const webviewMessageHandler = async (
 						baseUrl: apiConfiguration.ovhCloudAiEndpointsBaseUrl,
 					},
 				},
-				// kilocode_change end
+				{
+					key: "inception",
+					options: {
+						provider: "inception",
+						apiKey: apiConfiguration.inceptionLabsApiKey,
+						baseUrl: apiConfiguration.inceptionLabsBaseUrl,
+					},
+				},
 			]
 			// kilocode_change end
 
@@ -1094,6 +1101,33 @@ export const webviewMessageHandler = async (
 			break
 		}
 		// kilocode_change end
+		case "requestCheckpointRestoreApproval": {
+			const result = requestCheckpointRestoreApprovalPayloadSchema.safeParse(message.payload)
+
+			if (result.success) {
+				const { commitHash, checkpointTs, messagesToRemove, confirmationText } = result.data
+				const task = provider.getCurrentTask()
+
+				if (task) {
+					const askMessage = {
+						ts: Date.now(),
+						type: "ask" as const,
+						ask: "checkpoint_restore" as const,
+						text: JSON.stringify({
+							commitHash,
+							checkpointTs,
+							messagesToRemove,
+							confirmationText,
+						}),
+					}
+
+					task.clineMessages.push(askMessage)
+					await provider.postStateToWebview()
+				}
+			}
+
+			break
+		}
 		case "checkpointRestore": {
 			const result = checkoutRestorePayloadSchema.safeParse(message.payload)
 
@@ -2100,6 +2134,7 @@ export const webviewMessageHandler = async (
 				}
 
 				await provider.upsertProviderProfile(message.text, configToSave)
+				vscode.commands.executeCommand("kilo-code.ghost.reload") // kilocode_change: Reload ghost model when API provider settings change
 
 				// Ensure state is posted to webview after profile update to reflect organization mode changes
 				if (organizationChanged) {
@@ -3739,6 +3774,69 @@ export const webviewMessageHandler = async (
 			vscode.window.showWarningMessage(t("common:mdm.info.organization_requires_auth"))
 			break
 		}
+
+		// kilocode_change start - Auto-purge settings handlers
+		case "autoPurgeEnabled":
+			await updateGlobalState("autoPurgeEnabled", message.bool ?? false)
+			await provider.postStateToWebview()
+			break
+		case "autoPurgeDefaultRetentionDays":
+			await updateGlobalState("autoPurgeDefaultRetentionDays", message.value ?? 30)
+			await provider.postStateToWebview()
+			break
+		case "autoPurgeFavoritedTaskRetentionDays":
+			await updateGlobalState("autoPurgeFavoritedTaskRetentionDays", message.value ?? null)
+			await provider.postStateToWebview()
+			break
+		case "autoPurgeCompletedTaskRetentionDays":
+			await updateGlobalState("autoPurgeCompletedTaskRetentionDays", message.value ?? 30)
+			await provider.postStateToWebview()
+			break
+		case "autoPurgeIncompleteTaskRetentionDays":
+			await updateGlobalState("autoPurgeIncompleteTaskRetentionDays", message.value ?? 7)
+			await provider.postStateToWebview()
+			break
+		case "manualPurge":
+			try {
+				const state = await provider.getState()
+				const autoPurgeSettings = {
+					enabled: state.autoPurgeEnabled ?? false,
+					defaultRetentionDays: state.autoPurgeDefaultRetentionDays ?? 30,
+					favoritedTaskRetentionDays: state.autoPurgeFavoritedTaskRetentionDays ?? null,
+					completedTaskRetentionDays: state.autoPurgeCompletedTaskRetentionDays ?? 30,
+					incompleteTaskRetentionDays: state.autoPurgeIncompleteTaskRetentionDays ?? 7,
+					lastRunTimestamp: state.autoPurgeLastRunTimestamp,
+				}
+
+				if (!autoPurgeSettings.enabled) {
+					vscode.window.showWarningMessage("Auto-purge is disabled. Please enable it in settings first.")
+					break
+				}
+
+				const scheduler = new AutoPurgeScheduler(provider.contextProxy.globalStorageUri.fsPath)
+				const currentTaskId = provider.getCurrentTask()?.taskId
+
+				await scheduler.triggerManualPurge(
+					autoPurgeSettings,
+					provider.getTaskHistory(),
+					currentTaskId,
+					async (taskId: string) => {
+						// Remove task from state when purged
+						await provider.deleteTaskFromState(taskId)
+					},
+				)
+
+				// Update last run timestamp
+				await updateGlobalState("autoPurgeLastRunTimestamp", Date.now())
+				await provider.postStateToWebview()
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : String(error)
+				provider.log(`Error in manual purge: ${errorMessage}`)
+				vscode.window.showErrorMessage(`Manual purge failed: ${errorMessage}`)
+			}
+			break
+
+		// kilocode_change end
 
 		/**
 		 * Chat Message Queue

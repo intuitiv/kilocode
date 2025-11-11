@@ -33,6 +33,9 @@ import {
 	// kilocode_change start
 	VirtualQuotaFallbackHandler,
 	GeminiCliHandler,
+	SyntheticHandler,
+	OVHcloudAIEndpointsHandler,
+	MiniMaxHandler,
 	// kilocode_change end
 	ClaudeCodeHandler,
 	QwenCodeHandler,
@@ -41,15 +44,14 @@ import {
 	DoubaoHandler,
 	ZAiHandler,
 	FireworksHandler,
-	SyntheticHandler, // kilocode_change
 	RooHandler,
 	FeatherlessHandler,
 	VercelAiGatewayHandler,
 	DeepInfraHandler,
-	OVHcloudAIEndpointsHandler, // kilocode_change
 } from "./providers"
 // kilocode_change start
 import { KilocodeOpenrouterHandler } from "./providers/kilocode-openrouter"
+import { InceptionLabsHandler } from "./providers/inception"
 // kilocode_change end
 import { NativeOllamaHandler } from "./providers/native-ollama"
 
@@ -108,6 +110,8 @@ export interface ApiHandler {
 	 * @returns A promise resolving to the token count
 	 */
 	countTokens(content: Array<Anthropic.Messages.ContentBlockParam>): Promise<number>
+
+	contextWindow?: number // kilocode_change: Add contextWindow property for virtual quota fallback
 }
 
 export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
@@ -191,6 +195,12 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 		// kilocode_change start
 		case "synthetic":
 			return new SyntheticHandler(options)
+		case "inception":
+			return new InceptionLabsHandler(options)
+		case "ovhcloud":
+			return new OVHcloudAIEndpointsHandler(options)
+		case "minimax":
+			return new MiniMaxHandler(options)
 		// kilocode_change end
 		case "io-intelligence":
 			return new IOIntelligenceHandler(options)
@@ -202,10 +212,6 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 			return new FeatherlessHandler(options)
 		case "vercel-ai-gateway":
 			return new VercelAiGatewayHandler(options)
-		// kilocode_change start
-		case "ovhcloud":
-			return new OVHcloudAIEndpointsHandler(options)
-		// kilocode_change end
 		default:
 			apiProvider satisfies "gemini-cli" | undefined
 			return new AnthropicHandler(options)

@@ -22,6 +22,13 @@ import {
 	geminiCliDefaultModelId,
 	deepSeekDefaultModelId,
 	moonshotDefaultModelId,
+	// kilocode_change start
+	minimaxDefaultModelId,
+	syntheticDefaultModelId,
+	ovhCloudAiEndpointsDefaultModelId,
+	inceptionDefaultModelId,
+	nativeFunctionCallingProviders,
+	// kilocode_change end
 	mistralDefaultModelId,
 	xaiDefaultModelId,
 	groqDefaultModelId,
@@ -33,14 +40,11 @@ import {
 	internationalZAiDefaultModelId,
 	mainlandZAiDefaultModelId,
 	fireworksDefaultModelId,
-	syntheticDefaultModelId, // kilocode_change
 	featherlessDefaultModelId,
 	ioIntelligenceDefaultModelId,
 	rooDefaultModelId,
 	vercelAiGatewayDefaultModelId,
 	deepInfraDefaultModelId,
-	ovhCloudAiEndpointsDefaultModelId, // kilocode_change
-	nativeFunctionCallingProviders, // kilocode_change: Added import for native function calling providers
 } from "@roo-code/types"
 
 import { vscode } from "@src/utils/vscode"
@@ -100,13 +104,15 @@ import {
 	GeminiCli,
 	VirtualQuotaFallbackProvider,
 	Synthetic,
+	OvhCloudAiEndpoints,
+	Inception,
+	MiniMax,
 	// kilocode_change end
 	ZAi,
 	Fireworks,
 	Featherless,
 	VercelAiGateway,
 	DeepInfra,
-	OvhCloudAiEndpoints, // kilocode_change
 } from "./providers"
 
 import { MODELS_BY_PROVIDER, PROVIDERS } from "./constants"
@@ -126,6 +132,7 @@ import { BedrockCustomArn } from "./providers/BedrockCustomArn"
 import { KiloCode } from "../kilocode/settings/providers/KiloCode" // kilocode_change
 import { buildDocLink } from "@src/utils/docLinks"
 import { KiloProviderRouting, KiloProviderRoutingManagedByOrganization } from "./providers/KiloProviderRouting"
+import { RateLimitAfterControl } from "./RateLimitAfterSettings" // kilocode_change
 
 export interface ApiOptionsProps {
 	uriScheme: string | undefined
@@ -397,9 +404,7 @@ const ApiOptions = ({
 							: internationalZAiDefaultModelId,
 				},
 				fireworks: { field: "apiModelId", default: fireworksDefaultModelId },
-				synthetic: { field: "apiModelId", default: syntheticDefaultModelId }, // kilocode_change
 				featherless: { field: "apiModelId", default: featherlessDefaultModelId },
-				ovhcloud: { field: "ovhCloudAiEndpointsModelId", default: ovhCloudAiEndpointsDefaultModelId }, // kilocode_change
 				"io-intelligence": { field: "ioIntelligenceModelId", default: ioIntelligenceDefaultModelId },
 				roo: { field: "apiModelId", default: rooDefaultModelId },
 				"vercel-ai-gateway": { field: "vercelAiGatewayModelId", default: vercelAiGatewayDefaultModelId },
@@ -409,6 +414,10 @@ const ApiOptions = ({
 				// kilocode_change start
 				kilocode: { field: "kilocodeModel", default: kilocodeDefaultModel },
 				"gemini-cli": { field: "apiModelId", default: geminiCliDefaultModelId },
+				minimax: { field: "apiModelId", default: minimaxDefaultModelId },
+				synthetic: { field: "apiModelId", default: syntheticDefaultModelId },
+				ovhcloud: { field: "ovhCloudAiEndpointsModelId", default: ovhCloudAiEndpointsDefaultModelId },
+				inception: { field: "inceptionLabsModelId", default: inceptionDefaultModelId },
 				// kilocode_change end
 			}
 
@@ -438,7 +447,16 @@ const ApiOptions = ({
 
 		// kilocode_change start
 		// Providers that don't have documentation pages yet
-		const excludedProviders = ["gemini-cli", "moonshot", "chutes", "cerebras", "litellm", "zai", "qwen-code"]
+		const excludedProviders = [
+			"gemini-cli",
+			"moonshot",
+			"chutes",
+			"cerebras",
+			"litellm",
+			"zai",
+			"qwen-code",
+			"minimax",
+		]
 
 		// Skip documentation link when the provider is excluded because documentation is not available
 		if (excludedProviders.includes(selectedProvider)) {
@@ -571,6 +589,19 @@ const ApiOptions = ({
 				/>
 			)}
 
+			{/* kilocode_change start */}
+			{selectedProvider === "inception" && (
+				<Inception
+					apiConfiguration={apiConfiguration}
+					setApiConfigurationField={setApiConfigurationField}
+					routerModels={routerModels}
+					refetchRouterModels={refetchRouterModels}
+					organizationAllowList={organizationAllowList}
+					modelValidationError={modelValidationError}
+				/>
+			)}
+			{/* kilocode_change end */}
+
 			{selectedProvider === "anthropic" && (
 				<Anthropic apiConfiguration={apiConfiguration} setApiConfigurationField={setApiConfigurationField} />
 			)}
@@ -695,6 +726,10 @@ const ApiOptions = ({
 					organizationAllowList={organizationAllowList}
 					modelValidationError={modelValidationError}
 				/>
+			)}
+
+			{selectedProvider === "minimax" && (
+				<MiniMax apiConfiguration={apiConfiguration} setApiConfigurationField={setApiConfigurationField} />
 			)}
 
 			{selectedProvider === "gemini-cli" && (
@@ -887,7 +922,7 @@ const ApiOptions = ({
 				// kilocode_change end
 			}
 
-			{!fromWelcomeView && (
+			{!fromWelcomeView && selectedProvider !== "virtual-quota-fallback" /*kilocode_change*/ && (
 				<Collapsible open={isAdvancedSettingsOpen} onOpenChange={setIsAdvancedSettingsOpen}>
 					<CollapsibleTrigger className="flex items-center gap-1 w-full cursor-pointer hover:opacity-80 mb-2">
 						<span className={`codicon codicon-chevron-${isAdvancedSettingsOpen ? "down" : "right"}`}></span>
@@ -920,6 +955,14 @@ const ApiOptions = ({
 								maxValue={2}
 							/>
 						)}
+						{
+							// kilocode_change start
+							<RateLimitAfterControl
+								rateLimitAfterEnabled={apiConfiguration.rateLimitAfter}
+								onChange={(field, value) => setApiConfigurationField(field, value)}
+							/>
+							// kilocode_change end
+						}
 						<RateLimitSecondsControl
 							value={apiConfiguration.rateLimitSeconds || 0}
 							onChange={(value) => setApiConfigurationField("rateLimitSeconds", value)}
