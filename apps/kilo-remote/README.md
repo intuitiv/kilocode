@@ -128,7 +128,7 @@ To connect to your specific Kilo Remote server, you'll need to provide its URL.
     EXPO_PUBLIC_DEFAULT_WORKSPACE_URL=http://your-server-url:3000
     ```
 
-    _(Note: The `EXPO_PUBLIC_` prefix is mandatory for variables to be accessible in the Expo client app.)_
+    _(Note: The `EXPO_PUBLIC_` prefix is mandatory for variables to be accessible in the Expo client app.)\_
 
 The `.env` file is ignored by Git, so your URL will remain private.
 
@@ -189,6 +189,31 @@ Builds a final, standalone release version (`.ipa`) and installs it on your USB-
 ```bash
 sh scripts/ios/deploy-standalone.sh "My iPhone"
 ```
+
+### Android Development
+
+**1. Clean & Install**
+Resets your project dependencies and cleans the native Android build artifacts.
+
+```bash
+sh scripts/android/clean-install.sh
+```
+
+**2. Develop**
+Starts the Expo development server and launches the app on a connected Android device or emulator.
+
+```bash
+sh scripts/android/develop.sh
+```
+
+**3. Deploy Standalone**
+Builds, installs, and launches a standalone release APK on the active emulator or connected device.
+
+```bash
+sh scripts/android/deploy-standalone.sh
+```
+
+The output APK can be found in `apps/kilo-remote/android/app/build/outputs/apk/release/`.
 
 ## Mock Server
 
